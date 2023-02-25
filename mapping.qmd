@@ -186,9 +186,8 @@ geo = gpd.GeoSeries(HWeventsInStates_.set_index('PolyID')['geometry']).to_json()
 ```{python}
 mapStates = folium.Map(location=[21.325001, 78.750000],
                         zoom_start=2,
-                        tiles='https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
                         prefer_canvas=True,
-                        attr="Hindutva Watch, Stadi Tiles",
+                        attr="Hindutva Watch",
                         height=1000)
 
 folium.Choropleth(
