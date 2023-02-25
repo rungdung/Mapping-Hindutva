@@ -85,4 +85,4 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
     futures = [executor.submit(process_doc, doc, index) for index, doc in enumerate(docs)]
 
 # Write the updated DataFrame to a file
-file.to_csv('HWdb1_geocoded.csv', index=False)
+file.to_csv('data/HWdb1_geocoded.csv', index=False)
