@@ -34,7 +34,7 @@
       <li>{@html feature.properties.title}</li>
       <!-- To zoom to selected feature-->
       <button on:click={() => zoomToFeature(feature)}
-        class="btn btn-dark btn-small">
+        class="bg-slate-700">
         Zoom to event
       </button>
     {/each}

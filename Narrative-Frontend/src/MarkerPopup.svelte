@@ -13,13 +13,13 @@
 </script>
 
 <div class="popup">
-  <h3>{title}</h3>
+  <h3>{@html title}</h3>
   <p>{date}</p>
   <a href={link}>Link to article</a>
   <p>{@html excerpt}</p>
   <br />
   <button
-    class="btn btn-dark btn-small"
+    class="bg-slate-700"
     id="addToList"
     on:click={() => addToList()}
   >

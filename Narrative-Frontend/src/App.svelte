@@ -31,7 +31,7 @@
       />
       <button
         on:click={() => searchLayer(dbLayer, searchQuery, map)}
-        class="rounded-md p-1"
+        class="rounded-md p-1 bg-slate-700"
         id="search-button">Search</button
       >
     </div>
