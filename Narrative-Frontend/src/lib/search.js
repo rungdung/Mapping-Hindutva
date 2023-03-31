@@ -23,8 +23,8 @@ export function searchLayer(dbLayer, searchQuery, map) {
 
   // If search results are found, zoom to the bounds of the search results layer and add to map
   if (searchResultsLayer.getLayers().length > 0) {
-    console.log(searchResultsLayer.getBounds());
-    map.fitBounds(searchResultsLayer.getBounds());
+    
+    //console.log(searchResultsLayer.getBounds());
     searchResultsLayer.addTo(map);
   } else {
     alert("No results found.");
