@@ -40,7 +40,7 @@
     {/each}
   </ul>
 {:else}
-  <p>No features selected.</p>
+  <p>No events selected. Please open an event and click, "Add to list"</p>
 {/if}
 
 <style>
