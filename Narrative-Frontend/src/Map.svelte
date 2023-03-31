@@ -2,6 +2,7 @@
 
 <script context=module>
   export let map;
+  export let dbLayer;
 </script>
 
 <script>
@@ -13,20 +14,20 @@
   import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
   import Popup from "./MarkerPopup.svelte";
-  export let dbLayer;
+  
 
   onMount(() => {
     // Initialize Leaflet map
     map = L.map("map", {
       renderer: L.canvas(),
-    }).setView([13.086066, 77.609997], 15);
+    }).setView([13.086066, 77.609997], 7);
 
     // Add OpenStreetMap tiles
     var tileLayer = L.tileLayer(
       "https://api.mapbox.com/styles/v1/rungdung/clftq8tyw001r01nwuzgk0gic/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicnVuZ2R1bmciLCJhIjoiY2tqeWh6cXF4MDgzMjJvbWVmbGQzYjAwMyJ9.U-aJyoqyKvTXlhVk43jV1A",
       {
         attribution:
-          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, Aman Bhargava map style, Mapbox Imagery',
+          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, Mapbox Imagery',
         maxZoom: 20,
         minZoom: 3,
         maxBounds: [

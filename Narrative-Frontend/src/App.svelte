@@ -1,15 +1,15 @@
 <script>
   import { searchLayer } from "./lib/search.js";
-  import Map from "./Map.svelte";
+  import Map, {map, dbLayer} from "./Map.svelte";
   import SelectedFeatures from "./SelectedFeatures.svelte";
   let funcs, searchQuery;
 </script>
 
 <main>
-  <Map bind:this={funcs} />
-  <div id="left-bar">
-    <div id="meta-info">
-      <h1>Explorer for Hindutva Watch</h1>
+  <Map />
+  <div id="left-bar" class="p-4">
+    <div id="meta-info" class="m-3">
+      <h1 class="font-bold text-3xl ">Explorer for Hindutva Watch</h1>
       <h3>This is a prototype to explore linked stories of Hindutva</h3>
     </div>
 
@@ -30,8 +30,8 @@
         placeholder="Search for an event"
       />
       <button
-        on:click={() => searchLayer(funcs.dbLayer, searchQuery, funcs.map)}
-        class="rounded-md"
+        on:click={() => searchLayer(dbLayer, searchQuery, map)}
+        class="rounded-md p-1"
         id="search-button">Search</button
       >
     </div>
