@@ -21,12 +21,12 @@
       >
     </div> -->
 
-    <div id="search">
+    <div id="search" class="m-2">
       <input
         type="text"
         id="search-input"
         bind:value={searchQuery}
-        class="rounded-md"
+        class="rounded-md text-white p-1"
         placeholder="Search for an event"
       />
       <button
@@ -67,6 +67,6 @@
   }
 
   #meta-info {
-    margin: 1em;
+    
   }
 </style>
