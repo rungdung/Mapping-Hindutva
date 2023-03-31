@@ -40,7 +40,7 @@ export function searchLayer() {
 type="text"
 id="search-input"
 bind:value={searchQuery}
-class="rounded-md text-white p-1 w-40"
+class="rounded-md text-white p-1 w-40 bg-slate-700"
 placeholder="Search for an event"
 />
 <button
