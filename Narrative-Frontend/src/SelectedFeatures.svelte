@@ -35,7 +35,7 @@
       <!-- To zoom to selected feature-->
       <button on:click={() => zoomToFeature(feature)}
         class="btn btn-dark btn-small">
-        Zoom to feature
+        Zoom to event
       </button>
     {/each}
   </ul>

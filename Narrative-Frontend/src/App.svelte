@@ -26,11 +26,12 @@
         type="text"
         id="search-input"
         bind:value={searchQuery}
-        placeholder="Search for a comment"
+        class="rounded-md"
+        placeholder="Search for an event"
       />
       <button
         on:click={() => searchLayer(funcs.dbLayer, searchQuery, funcs.map)}
-        class="btn btn-dark btn-small"
+        class="rounded-md"
         id="search-button">Search</button
       >
     </div>
