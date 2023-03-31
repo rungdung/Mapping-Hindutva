@@ -10,20 +10,16 @@
   <div id="left-bar">
     <div id="meta-info">
       <h1>Explorer for Hindutva Watch</h1>
-      <h3>On maps. A case study on Jakkuru-Sampigehalli lake</h3>
-      This is a prototype to explore linked stories of Hindutva
+      <h3>This is a prototype to explore linked stories of Hindutva</h3>
     </div>
 
-    <div id="">
-      <button class="btn btn-dark btn-small" id="download"
-        >Download GeoJSON</button
-      >
+    <!-- <div id="">
       <button
         on:click={() => funcs.loadSavedData()}
         class="btn btn-dark btn-small"
         id="load">Load GeoJSON</button
       >
-    </div>
+    </div> -->
 
     <div id="search">
       <input
@@ -40,7 +36,7 @@
     </div>
   </div>
   <div id="right-bar">
-    <SelectedFeatures/>
+    <SelectedFeatures />
   </div>
 </main>
 
@@ -58,7 +54,8 @@
     right: 5%;
     width: 40%;
   }
-  #left-bar, #right-bar{
+  #left-bar,
+  #right-bar {
     z-index: 2000;
     padding: 1em;
     text-align: left;

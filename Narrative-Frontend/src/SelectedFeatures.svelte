@@ -26,18 +26,32 @@
 </script>
 
 
-<h2>Selected Features</h2>
+<h2 class="font-semibold text-xl ">Events in focus</h2>
 
 {#if $selectedFeatures.length > 0}
   <ul>
     {#each $selectedFeatures as feature}
-      <li>{feature.properties.title}</li>
+      <li>{@html feature.properties.title}</li>
       <!-- To zoom to selected feature-->
       <button on:click={() => zoomToFeature(feature)}
-        class="btn btn-dark"/>
+        class="btn btn-dark btn-small">
         Zoom to feature
+      </button>
     {/each}
   </ul>
 {:else}
   <p>No features selected.</p>
 {/if}
+
+<style>
+button {
+  margin-top: 0.2em;
+  size: 1em;
+  padding: 0.2em 0.5em;
+}
+
+ul {
+  list-style-type: none;
+  padding: 1em;
+}
+</style>

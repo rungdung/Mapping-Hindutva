@@ -1,5 +1,7 @@
+<svelte:options accessors={true} />
+
 <script context=module>
-    export let map;
+  export let map;
 </script>
 
 <script>
@@ -38,21 +40,20 @@
 
     // Initialize a layer group for comments
     dbLayer = L.markerClusterGroup().addTo(map);
-  });
 
+    loadSavedData();
+  });
 
   export async function loadSavedData() {
     // load geojson data
     const response = await fetch("HWdb_geocoded.geojson");
     var data = await response.json();
 
-    
-
     // add geojson layer from db
     L.geoJSON(data, {
       onEachFeature: (feature, layer) => {
-        let popupContainer = document.createElement('div');
-        let popupContent = new Popup({
+        let popupContainer = document.createElement("div");
+        new Popup({
           target: popupContainer,
           props: {
             title: feature.properties.title,
@@ -60,23 +61,18 @@
             link: feature.properties.link,
             excerpt: feature.properties.excerpt,
             feature: feature,
-
-          },})
-          layer.bindPopup(popupContainer);
-          
+          },
+        });
+        layer.bindPopup(popupContainer);
       },
     }).addTo(dbLayer);
-}
-  </script>
-
-
+  }
+</script>
 
 <main>
   <div id="map" />
-
-  
 </main>
-<svelte:options accessors={true}/>
+
 <style>
   #map {
     height: 100vh;
