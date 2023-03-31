@@ -26,12 +26,12 @@
         type="text"
         id="search-input"
         bind:value={searchQuery}
-        class="rounded-md text-white p-1"
+        class="rounded-md text-white p-1 w-40"
         placeholder="Search for an event"
       />
       <button
         on:click={() => searchLayer(dbLayer, searchQuery, map)}
-        class="rounded-md p-1 bg-slate-700"
+        class="rounded-md p-1 mt-2 bg-slate-700"
         id="search-button">Search</button
       >
     </div>
@@ -46,7 +46,7 @@
     position: absolute;
     top: 5%;
     left: 5%;
-    width: 40%;
+    width: 50%;
   }
 
   #right-bar {
