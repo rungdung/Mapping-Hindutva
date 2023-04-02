@@ -8,13 +8,15 @@
 <script>
   import { onMount } from "svelte";
   import 'leaflet/dist/leaflet.css'
+  import "leaflet/dist/images/marker-shadow.png"
+  import "leaflet/dist/images/marker-icon.png"
   import 'leaflet'
   import "leaflet.markercluster";
   import "leaflet.markercluster/dist/MarkerCluster.css";
+  
   import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
   import Popup from "./MarkerPopup.svelte";
-  
 
   onMount(() => {
     // Initialize Leaflet map
