@@ -7,7 +7,16 @@
 
   import { selectedFeatures } from "./stores.js";
   async function addToList() {
-    selectedFeatures.update((features) => [...features, feature]);
+   selectedFeatures.update( selectedFeaturesValue => {
+    const newFeature = {
+      title: title,
+      date: date,
+      link: link,
+      excerpt: excerpt,
+      feature: feature
+    };
+  return [...selectedFeaturesValue, newFeature];
+  }) 
     console.log("Clicked");
   }
 </script>
@@ -18,12 +27,7 @@
   <a href={link}>Link to article</a>
   <p>{@html excerpt}</p>
   <br />
-  <button
-    class="bg-slate-700"
-    id="addToList"
-    on:click={() => addToList()}
-  >
+  <button class="bg-slate-700" id="addToList" on:click={() => addToList()}>
     Add to list
   </button>
 </div>
-
