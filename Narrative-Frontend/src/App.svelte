@@ -2,7 +2,18 @@
   import Map from "./Map.svelte";
   import SelectedFeatures from "./SelectedFeatures.svelte";
   import Search from "./Search.svelte";
+  import { CollapsibleCard} from 'svelte-collapsible/dist/index.mjs'
+
+  let innerWidth
+  let innerHeight
+
+  let height
+
+  $: height = innerHeight/2
+
 </script>
+
+<svelte:window bind:innerWidth bind:innerHeight />
 
 <main>
   <Map />
@@ -24,9 +35,16 @@
       <Search />
     </div>
   </div>
-  <div id="right-bar">
-    <SelectedFeatures />
-  </div>
+<div id="right-bar" class="p-4">
+  <CollapsibleCard>
+      <h2 class="font-semibold text-xl " slot="header">Events in focus &#8964;</h2>
+      <div slot='body'>
+        <SelectedFeatures 
+          height={height}/>
+      </div>
+
+  </CollapsibleCard>
+</div>
 </main>
 
 <style>
@@ -41,7 +59,8 @@
     position: absolute;
     top: 5%;
     right: 5%;
-    width: 40%;
+    width: 90%;
+    max-width: 40%!important;
   }
   #left-bar,
   #right-bar {
