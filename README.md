@@ -6,8 +6,9 @@
 ## Prototype
 - The database is scraped from the Hindutva Watch website and stored in a CSV
 - ```SpaCy``` is used to extract named locations (NER) from the text
-- The lowest denominator location is selected and geocoded
-- It is then mapped using ```Folium```
+- The lowest denominator location is selected and geocoded. This might be a cause for concern as the geocoding is not always accurate. Choices have to be weighted better
+- It is then mapped using ```Leaflet```,
+- ```Svelte``` and ```Svelvet``` are used to create interactions and a narrative maker.
 
 ## Roadmap
 - [ ] Refine geocoding to be more accurate.
