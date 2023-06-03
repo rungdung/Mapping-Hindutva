@@ -20,3 +20,9 @@
 - [ ] Research on event classification and other narrative building elements.    
 
 
+### LLM models 
+- Alpaca, AlpacaLora, LLaMa etc... (https://huggingface.co/Pi3141/alpaca-native-13B-ggml/tree/main)
+  - Both the 7B and 13B are highly dependant on the prompts, they need to be explored
+- Instructor Embedder (https://huggingface.co/hkunlp/instructor-large)
+  - 
+- Electra (https://huggingface.co/spaces/brijw/transformers_ner/blob/main/app.py)
