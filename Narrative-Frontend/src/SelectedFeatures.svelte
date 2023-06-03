@@ -44,8 +44,9 @@
         feature: feature,
       });
     }
-  nodes=nodes})
-    
+    nodes = nodes;
+  });
+
   $: if ($selectedFeatures.length > 0) {
     lastValue = $selectedFeatures[$selectedFeatures.length - 1];
 
@@ -100,9 +101,9 @@
 
 <div id="events-in-focus">
   <Svelvet {height} editable={true}>
-    <Background bgColor="#faebd7" />
+    <Background bgColor="#faebd7" slot="background" />
     {#each nodes as node}
-      <Node {...node} on:nodeClicked={zoomToFeature} >
+      <Node {...node} on:nodeClicked={zoomToFeature}>
         <div class="node">
           <section class="container mx-3 my-3">
             <h2>{node.label}</h2>
@@ -113,7 +114,7 @@
             />
 
             <select
-              class="text-white my-2"
+              class="text-white my-1"
               value={node.category}
               placeholder="Select a category"
             >
@@ -123,19 +124,19 @@
                 </option>
               {/each}
             </select>
-            
-            <input
-            class="text-white my-1"
-            value={node.notes}
-            placeholder="Charts to display"
-          />
 
-          <input
-            class="text-white my-1"
-            value={node.notes}
-            placeholder="Geospatial morphing/effects"
-          />
-            
+            <input
+              class="text-white my-1"
+              value={node.notes}
+              placeholder="Charts to display"
+            />
+
+            <input
+              class="text-white my-1"
+              value={node.notes}
+              placeholder="Geospatial morphing/effects"
+            />
+            <Resizer width height rotation />
           </section>
 
           <Anchor direction="west" dynamic />
@@ -175,7 +176,7 @@
     padding: 0.2em 0.5em;
   }
 
-  #background-wrapper{
+  #background-wrapper {
     background-color: #faebd7;
   }
 
