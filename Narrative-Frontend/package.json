@@ -14,10 +14,13 @@
     "vite": "^4.2.0"
   },
   "dependencies": {
+    "drawflow": "^0.0.59",
     "leaflet": "^1.9.3",
     "leaflet-search": "^3.0.9",
     "leaflet.markercluster": "^1.5.3",
+    "litegraph": "^0.0.0",
+    "litegraph.js": "^0.7.12",
     "svelte-collapsible": "^0.2.1",
-    "svelvet": "^6.0.12"
+    "svelvet": "^7.0.48"
   }
 }
