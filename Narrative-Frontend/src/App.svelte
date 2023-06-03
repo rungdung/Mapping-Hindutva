@@ -9,7 +9,7 @@
 
   let height
 
-  $: height = innerHeight/2
+  $: height = innerHeight/1.4
 
 </script>
 

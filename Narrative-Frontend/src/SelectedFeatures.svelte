@@ -1,11 +1,16 @@
-<script context="module">
-  export let nodes = [];
-</script>
-
 <script>
   import "leaflet";
   import { map } from "./Map.svelte";
-  import Svelvet from "svelvet";
+
+  import {
+    Node,
+    Svelvet,
+    Minimap,
+    Controls,
+    Resizer,
+    Anchor,
+    Background,
+  } from "svelvet";
 
   import { selectedFeatures } from "./stores.js";
   import { onMount } from "svelte";
@@ -13,11 +18,50 @@
   let highlightLayer = new L.FeatureGroup();
 
   let edges = [];
-  let id = 1;
-  export let width;
-  export let height
 
-  function zoomToFeature(feature) {
+  let width;
+  export let height;
+  let nodes = [];
+  let lastValue;
+
+  let categories = [
+    { text: "Category 1", value: "1" },
+    { text: "Category 2", value: "2" },
+    { text: "Category 3", value: "3" },
+  ];
+  // read from subscribed store
+  // if reloading, load all from store
+  // else load from local storage
+
+  onMount(() => {
+    for (let i = 0; i < $selectedFeatures.length; i++) {
+      let feature = $selectedFeatures[i];
+      nodes.push({
+        label: feature.title,
+        width: 220,
+        height: 100,
+        notes: "",
+        feature: feature,
+      });
+    }
+  nodes=nodes})
+    
+  $: if ($selectedFeatures.length > 0) {
+    lastValue = $selectedFeatures[$selectedFeatures.length - 1];
+
+    nodes.push({
+      label: lastValue.title,
+      width: 220,
+      height: 200,
+      notes: "",
+      feature: lastValue.feature,
+    });
+
+    nodes = nodes;
+  }
+
+  function zoomToFeature(e) {
+    let feature = e.feature;
     highlightLayer.clearLayers();
     console.log("Zooming to feature");
 
@@ -34,7 +78,6 @@
     map.flyTo(feature.geometry.coordinates, 4);
     highlightLayer.addTo(map);
   }
-
   function highlightAllFeatures(feature) {
     highlightLayer.clearLayers();
     console.log("Zooming to feature");
@@ -53,53 +96,54 @@
     // map.flyTo(feature.geometry.coordinates, 8);
     highlightLayer.addTo(map);
   }
-  
-  // update nodes on load
-  const features = $selectedFeatures;
-  features.forEach((feature) => {
-    nodes.push({
-      id: `${id++}`,
-      position: { x: 0, y: 0 },
-      data: { html: String(feature.title) },
-      width: 100,
-      height: 50,
-      clickCallback: () => zoomToFeature(feature.feature),
-    });
-  });
-  // on new addition
-  $: {
-    const features = $selectedFeatures;
-    const lastFeature = features[features.length - 1];
-    if (lastFeature) {
-      nodes.push({
-        id: `${id++}`,
-        position: { x: 0, y: 0 },
-        data: { html: String(lastFeature.title) },
-        width: 100,
-        height: 50,
-        clickCallback: () => zoomToFeature(lastFeature.feature),
-      });
-    }
-  }
-
 </script>
 
 <div id="events-in-focus">
-  {#key $selectedFeatures}
-    <Svelvet
-      nodes={nodes}
-      edges={edges}
-      width={width}
-      height={height}
-      background={true}
-      bgColor={"antiquewhite"}
-      nodeCreate={true}
-      snap={true}
-      editable
-      initialZoom={1}
-      shareable={false}
-    />
-  {/key}
+  <Svelvet {height} editable={true}>
+    <Background bgColor="#faebd7" />
+    {#each nodes as node}
+      <Node {...node} on:nodeClicked={zoomToFeature} >
+        <div class="node">
+          <section class="container mx-3 my-3">
+            <h2>{node.label}</h2>
+            <input
+              class="text-white my-1"
+              value={node.notes}
+              placeholder="Enter notes"
+            />
+
+            <select
+              class="text-white my-2"
+              value={node.category}
+              placeholder="Select a category"
+            >
+              {#each categories as category}
+                <option value={category}>
+                  {category.text}
+                </option>
+              {/each}
+            </select>
+            
+            <input
+            class="text-white my-1"
+            value={node.notes}
+            placeholder="Charts to display"
+          />
+
+          <input
+            class="text-white my-1"
+            value={node.notes}
+            placeholder="Geospatial morphing/effects"
+          />
+            
+          </section>
+
+          <Anchor direction="west" dynamic />
+          <Anchor direction="west" dynamic />
+        </div>
+      </Node>
+    {/each}
+  </Svelvet>
 
   {#if nodes.length < 1}
     <p>No events selected. Please open an event and click, "Add to list"</p>
@@ -131,6 +175,20 @@
     padding: 0.2em 0.5em;
   }
 
+  #background-wrapper{
+    background-color: #faebd7;
+  }
+
+  .node {
+    width: 100%;
+    height: 100%;
+    background-color: #faebd7;
+    border-radius: 8px;
+    border: 2px solid black;
+  }
+  .selected {
+    border: 2px solid white;
+  }
   ul {
     list-style-type: none;
     padding: 1em;

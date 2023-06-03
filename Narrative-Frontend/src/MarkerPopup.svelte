@@ -7,7 +7,6 @@
 
   import { selectedFeatures } from "./stores.js";
   async function addToList() {
-   selectedFeatures.update( selectedFeaturesValue => {
     const newFeature = {
       title: title,
       date: date,
@@ -15,9 +14,16 @@
       excerpt: excerpt,
       feature: feature
     };
-  return [...selectedFeaturesValue, newFeature];
-  }) 
-    console.log("Clicked");
+    
+    selectedFeatures.update((features) => {
+      features.push(newFeature);
+
+      console.log("pushing to selected features");
+      console.log(features)
+      return features;
+    });
+
+
   }
 </script>
 
