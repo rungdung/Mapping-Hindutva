@@ -97,9 +97,9 @@
     map = new maplibre.Map({
       container: mapContainer,
       style: `https://api.maptiler.com/maps/5b0fdf12-ac62-4bd8-975b-50ac01e3abbd/style.json?key=${publicMaptilerKey}`,
-      center: [0, 0],
-      pitch: 0,
-      bearing: 0,
+      center: [77.695313, 23.160563],
+      pitch: 32,
+      bearing: 20,
       zoom: 3,
       maxZoom: 14,
       minZoom: 3,

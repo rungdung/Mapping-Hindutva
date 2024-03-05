@@ -19,18 +19,20 @@
 
 <main class="h-screen w-screen">
   <Map bind:map />
-  <div id="left-bar" class="p-4">
-    <div id="meta-info" class="m-3">
-      <h1 class="font-bold text-3xl">
+  <div id="left-bar">
+    <div id="meta-info" class="p-4 bg-orange-100 rounded-xl">
+      <h1 class="font-bold font-700 text-3xl">
         Explorer for Ethno-Political activity in India
       </h1>
       <h3>
-        This is a prototype to explore linked stories of Hindutva, communal
-        violence and related incidents
+        <br />
+        This is a prototype to explore linked stories of Hindutva, communal violence
+        and related incidents. <br /> <br /> Search for incidents or click on an
+        event and do a proximity search.
       </h3>
     </div>
 
-    <div id="search" class="m-2">
+    <div id="search" class="mt-3 p-2 w-full bg-orange-100 rounded-xl">
       <Search bind:map />
     </div>
   </div>
@@ -49,8 +51,8 @@
 <style>
   #left-bar {
     position: absolute;
-    top: 5%;
-    left: 5%;
+    top: 3%;
+    left: 3%;
     width: 50%;
   }
 
@@ -64,11 +66,10 @@
   #left-bar,
   #right-bar {
     z-index: 2000;
-    padding: 1em;
     text-align: left;
     color: black;
     border-radius: 10px;
-    background-color: antiquewhite;
+
     max-width: 20%;
   }
 
