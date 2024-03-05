@@ -1,41 +1,39 @@
 <script>
   import Map from "./Map.svelte";
-  import SelectedFeatures from "./SelectedFeatures.svelte";
+  // import SelectedFeatures from "./SelectedFeatures.svelte";
   import Search from "./Search.svelte";
-  import { CollapsibleCard} from 'svelte-collapsible/dist/index.mjs'
+  import { CollapsibleCard } from "svelte-collapsible/dist/index.mjs";
 
-  let innerWidth
-  let innerHeight
+  let innerWidth;
+  let innerHeight;
 
-  let height
+  let height;
 
-  $: height = innerHeight/1.4
+  let map;
 
+  $: height = innerHeight / 1.4;
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
 
-<main>
-  <Map />
+<main class="h-screen w-screen">
+  <Map bind:map />
   <div id="left-bar" class="p-4">
     <div id="meta-info" class="m-3">
-      <h1 class="font-bold text-3xl ">Explorer for Hindutva Watch</h1>
-      <h3>This is a prototype to explore linked stories of Hindutva</h3>
+      <h1 class="font-bold text-3xl">
+        Explorer for Ethno-Political activity in India
+      </h1>
+      <h3>
+        This is a prototype to explore linked stories of Hindutva, communal
+        violence and related incidents
+      </h3>
     </div>
-
-    <!-- <div id="">
-      <button
-        on:click={() => funcs.loadSavedData()}
-        class="btn btn-dark btn-small"
-        id="load">Load GeoJSON</button
-      >
-    </div> -->
 
     <div id="search" class="m-2">
-      <Search />
+      <Search bind:map />
     </div>
   </div>
-<div id="right-bar" class="p-4">
+  <!-- <div id="right-bar" class="p-4">
   <CollapsibleCard>
       <h2 class="font-semibold text-xl " slot="header">Events in focus &#8964;</h2>
       <div slot='body'>
@@ -44,7 +42,7 @@
       </div>
 
   </CollapsibleCard>
-</div>
+</div> -->
 </main>
 
 <style>
@@ -60,7 +58,7 @@
     top: 5%;
     right: 5%;
     width: 90%;
-    max-width: 40%!important;
+    max-width: 40% !important;
   }
   #left-bar,
   #right-bar {
