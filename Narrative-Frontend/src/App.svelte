@@ -1,4 +1,5 @@
 <script>
+  window.global ||= window;
   import Map from "./Map.svelte";
   // import SelectedFeatures from "./SelectedFeatures.svelte";
   import Search from "./Search.svelte";
