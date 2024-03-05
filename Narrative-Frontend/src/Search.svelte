@@ -1,50 +1,75 @@
 <script>
-import "leaflet-search/dist/leaflet-search.min.css";
-import "leaflet-search";
-import "leaflet";
+  import maplibre from "maplibre-gl";
+  import "maplibre-gl/dist/maplibre-gl.css";
 
-import {map, dbLayer} from "./Map.svelte";
-let searchQuery
-// searches a geojson layer for a given string
-// zooms to the first result
-// returns the number of results
-let searchResultsLayer = L.featureGroup();
+  let searchQuery;
 
-export function searchLayer() {
-  searchResultsLayer.clearLayers();
-  // Loop through all layers in the dbLayer group and filter based on search query
-  dbLayer.eachLayer(layer => {
-    if (layer.feature.properties.excerpt.toLowerCase().includes(searchQuery.toLowerCase())) {
-      searchResultsLayer.addLayer(new L.CircleMarker(layer.getLatLng(), {
-        radius: 30,
-        color: "#ff7800",
-        weight: 5,
-        opacity: 0.65
-        }));
+  export let map;
+
+  export function searchLayer() {
+    let toBehighlighted = [],
+      features;
+    // query the layer for the existence of a keyword in teh title
+    // get random points from nearby
+    let getNearbyFeatures = map.queryRenderedFeatures({
+      layers: ["point"],
+    });
+
+    // loop through the properties
+    // if the property exists, add it to the highlight layer
+    getNearbyFeatures.forEach((element) => {
+      if (
+        element.properties.excerpt
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      ) {
+        toBehighlighted.push(element);
+      }
+    });
+
+    // create a duplicate source for the highlight
+    if (map.getSource("hwdb-highlight")) {
+      features = map
+        .getSource("hwdb-highlight")
+        .setData({ type: "FeatureCollection", features: toBehighlighted })[
+        "_data"
+      ]["features"];
+    } else {
+      map.addSource("hwdb-highlight", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: "",
+        },
+      });
+      map.addLayer({
+        id: "hwdb-highlight",
+        type: "circle",
+        source: "hwdb-highlight",
+        paint: {
+          "circle-radius": 10,
+          "circle-color": "red",
+          "circle-opacity": 0.5,
+        },
+      });
+      features = map
+        .getSource("hwdb-highlight")
+        .setData({ type: "FeatureCollection", features: toBehighlighted })[
+        "_data"
+      ]["features"];
     }
-  });
-
-  // If search results are found, zoom to the bounds of the search results layer and add to map
-  if (searchResultsLayer.getLayers().length > 0) {
-    
-    //console.log(searchResultsLayer.getBounds());
-    searchResultsLayer.addTo(map);
-  } else {
-    alert("No results found.");
   }
-}
 </script>
 
-
 <input
-type="text"
-id="search-input"
-bind:value={searchQuery}
-class="rounded-md text-white p-1 w-40 bg-slate-700"
-placeholder="Search for an event"
+  type="text"
+  id="search-input"
+  bind:value={searchQuery}
+  class="rounded-md text-white p-1 w-40 bg-slate-700"
+  placeholder="Search for an event"
 />
 <button
-on:click={() => searchLayer()}
-class="rounded-md p-1 mt-2 bg-slate-700"
-id="search-button">Search</button
+  on:click={() => searchLayer()}
+  class="rounded-md p-1 mt-2 bg-slate-700"
+  id="search-button">Search</button
 >
