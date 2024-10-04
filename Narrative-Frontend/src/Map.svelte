@@ -1,12 +1,4 @@
 <script>
-  /**
-   * Initialize the map and handle resource fetching and display based on spatialEnabled and resource properties.
-   * @param {Object} resource - The resource object containing details like id, filterExpression, center, zoom, pitch, bearing.
-   * @param {Blob} resourceBlob - The blob containing the resource data.
-   * @param {boolean} spatialEnabled - Flag indicating if spatial is enabled.
-   * @returns {void}
-   */
-
   // @ts-ignore
   import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
