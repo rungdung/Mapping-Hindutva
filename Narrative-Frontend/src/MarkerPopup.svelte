@@ -1,9 +1,5 @@
 <script>
   import * as Turf from "@turf/turf";
-  import { Deck } from "@deck.gl/core";
-  import { ArcLayer } from "@deck.gl/layers";
-  import { MapboxOverlay } from "@deck.gl/mapbox";
-    import Search from "./Search.svelte";
 
   export let title;
   export let date;
@@ -12,7 +8,7 @@
   export let map;
   export let point;
   export let coordinates;
-  let searchTerm
+  let searchTerm;
 
   async function highlightNetwork() {
     let width = 200;
@@ -33,11 +29,14 @@
     // loop through the properties
     // if the property exists, add it to the highlight layer
     getNearbyFeatures.forEach((element) => {
-      if (element.properties.excerpt.toLowerCase().includes(searchTerm.toLowerCase())) {
+      if (
+        element.properties.excerpt
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      ) {
         toBehighlighted.push(element);
       }
     });
-
 
     // create a duplicate source for the highlight
     if (map.getSource("hwdb-highlight")) {
@@ -72,8 +71,8 @@
     // convert to line features in geojson
     let arcgeojson = Turf.featureCollection(
       arcs.map((arc) =>
-        Turf.lineString([arc.sourcePosition, arc.targetPosition]),
-      ),
+        Turf.lineString([arc.sourcePosition, arc.targetPosition])
+      )
     );
 
     // Draw lines
@@ -95,54 +94,40 @@
         },
       });
     }
-
-    // console.log(arcs);
-
-    // // Use deck.gl to render arcs
-    // const deckgl = new MapboxOverlay({
-    //   layers: [
-    //     new ArcLayer({
-    //       id: "arc-layer",
-    //       data: arcs,
-    //       pickable: true,
-    // getWidth: 12,
-    //       opacity: 0.5,
-    //     }),
-    //   ],
-    // });
-    // map.addControl(deckgl);
-    // console.log(deckgl);
-
-    // // Handle map movement to update deck.gl layer
-    // map.on('move', () => {
-    //   const { lng, lat } = map.getCenter();
-    //   deckgl.setProps({
-    //     viewState: { longitude: lng, latitude: lat, zoom: map.getZoom() },
-    //   });
-    // });
   }
 </script>
 
 <div class="popup">
-  <h3>{@html title}</h3>
+  <h3 class="text-xl">{@html title}</h3>
   <p>{date}</p>
   <a href={link}>Link to article</a>
-  <p>{@html excerpt}</p>
+  <p class="text-3sm">{@html excerpt}</p>
   <br />
-  <input type="text" bind:value={searchTerm} placeholder="Search for related organisational involvement nearby" class="text-white p-2 rounded-lg"/>
-  <button class="bg-slate-700" id="addToList" disabled={searchTerm === ""} on:click={highlightNetwork}>
-    Visualise connections
-  </button>
+  <div class="float"><input
+    type="text"
+    bind:value={searchTerm}
+    placeholder="Search for related organisational involvement nearby"
+    class="text-white p-2 rounded-lg"
+  />
+  <button
+    class="bg-neutral-700"
+    id="addToList"
+    disabled={searchTerm === ""}
+    on:click={highlightNetwork}
+  >
+    Search nearby
+  </button></div>
+  
 </div>
 
 <style lang="postcss">
   .popup {
-    @apply text-black text-left bg-slate-100 p-3 rounded-md w-80;
+    @apply text-black text-left bg-neutral-100 p-3 rounded-md w-80;
   }
   :global(.maplibre-gl-popup-close-button) {
-    @apply text-black bg-slate-700;
+    @apply text-black bg-neutral-700;
   }
   :global(.maplibre-gl-popup-content) {
-    @apply bg-transparent;
+    background: aqua;
   }
 </style>
