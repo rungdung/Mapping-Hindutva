@@ -1,9 +1,7 @@
 <script>
   window.global ||= window;
   import Map from "./Map.svelte";
-  // import SelectedFeatures from "./SelectedFeatures.svelte";
   import Search from "./Search.svelte";
-  import { CollapsibleCard } from "svelte-collapsible/dist/index.mjs";
 
   let innerWidth;
   let innerHeight;
@@ -11,16 +9,16 @@
   let height;
 
   let map;
-
+  let eventsInHighlight;
   $: height = innerHeight / 1.4;
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
 
 <main class="h-screen w-screen">
-  <Map bind:map />
+  <Map bind:map bind:eventsInHighlight />
   <div id="left-bar">
-    <div id="meta-info" class="p-4 bg-orange-100 rounded-xl">
+    <div id="meta-info" class="p-4 bg-neutral-800 text-white rounded-xl">
       <h1 class="font-bold font-700 text-3xl">
         Explorer for Ethno-Political activity in India
       </h1>
@@ -32,8 +30,23 @@
       </h3>
     </div>
 
-    <div id="search" class="mt-3 p-2 w-full bg-orange-100 rounded-xl">
+    <div id="search" class="mt-3 p-2 w-full bg-neutral-800 rounded-xl">
       <Search bind:map />
+    </div>
+  </div>
+
+  <div id="right-bar">
+    <div id="meta-info" class="p-4 bg-neutral-800 text-white rounded-xl">
+      <h2 class="text-xl font-bold font-700 text-3xl">
+        Events within a radius of 100km
+      </h2>
+      <ul class="text-xs">
+        {#if eventsInHighlight}
+          {#each eventsInHighlight.features as event}
+            <li class="py-2">{event.properties.title}</li>
+          {/each}
+        {/if}
+      </ul>
     </div>
   </div>
   <!-- <div id="right-bar" class="p-4">
@@ -49,6 +62,9 @@
 </main>
 
 <style>
+  #right-bar {
+    @apply max-h-[70vh] overflow-y-auto;
+  }
   #left-bar {
     position: absolute;
     top: 3%;
@@ -61,7 +77,7 @@
     top: 5%;
     right: 5%;
     width: 90%;
-    max-width: 40% !important;
+    max-width: 20% !important;
   }
   #left-bar,
   #right-bar {

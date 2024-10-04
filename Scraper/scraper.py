@@ -14,10 +14,10 @@ while True:
 
         # printing all columns of the dataframe
         # print(df.columns)
-        dfSelected = df.loc[:, ['id', 'date', 'title.rendered', 'excerpt.rendered', 'link', 'content.rendered', 'featured_media']]
+        dfSelected = df.loc[:, ['id', 'date', 'categories', 'title.rendered', 'excerpt.rendered', 'link', 'content.rendered', 'featured_media']]
 
         # Save the dataframe as a CSV file
-        dfSelected.to_csv("data/HWdb1.csv", mode='a',  index=False)
+        dfSelected.to_csv("data/HWdb_23_09_2024.csv", mode='a',  index=False)
 
         print("Data of page" + str(i) + "saved to output.csv")
         i += 1

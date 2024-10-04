@@ -61,17 +61,17 @@
   }
 </script>
 
-<div class="w-full">
+<div class="w-full my-auto">
   <input
     type="text"
     id="search-input"
     bind:value={searchQuery}
-    class="rounded-md text-white p-1 bg-slate-700"
+    class="rounded-md !text-black p-1 bg-gray-300"
     placeholder="Search for an event"
   />
   <button
     on:click={() => searchLayer()}
-    class="rounded-md p-1 mt-2 bg-slate-700"
+    class="rounded-md !text-black p-1 mt-2 bg-gray-300"
     id="search-button">Search</button
   >
 </div>
