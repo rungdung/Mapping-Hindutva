@@ -1,12 +1,42 @@
 <script>
+  /**
+   * A component to search for events in the map.
+   * It takes a map object as a prop and exposes a function to search for events.
+   * The search is done by querying the "point" layer in the map and looking for
+   * events that have the search query in their excerpt.
+   * The matching events are then added to a new layer called "hwdb-highlight"
+   * and styled as red circles.
+   *
+   * @param {maplibre.Map} map - The map object.
+   */
+
   import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
 
+  /**
+   * The search query.
+   * @type {string}
+   */
   let searchQuery;
 
+  /**
+   * The map object.
+   * @type {maplibre.Map}
+   */
   export let map;
 
+  /**
+   * Searches for events in the map.
+   * It takes the search query and looks for events that have the search query
+   * in their excerpt.
+   * The matching events are then added to a new layer called "hwdb-highlight"
+   * and styled as red circles.
+   */
   export function searchLayer() {
+    /**
+     * The features that match the search query.
+     * @type {Array<maplibre.Feature>}
+     */
     let toBehighlighted = [],
       features;
     // query the layer for the existence of a keyword in teh title
@@ -75,3 +105,4 @@
     id="search-button">Search</button
   >
 </div>
+

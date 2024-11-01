@@ -1,6 +1,17 @@
 <script>
-  import * as Turf from "@turf/turf";
-
+  /**
+   * A component to render a popup for a point on the map.
+   * It will display the title, date, link, excerpt and related locations for the point.
+   * It will also allow the user to search for related organisational involvement nearby.
+   * @param {string} title - The title of the point.
+   * @param {string} date - The date of the point.
+   * @param {string} link - The link to the article.
+   * @param {string} excerpt - The excerpt of the article.
+   * @param {object} map - The map object.
+   * @param {object} point - The point object.
+   * @param {array} coordinates - The coordinates of the point.
+   * @param {string} locations - The related locations.
+   */
   export let title;
   export let date;
   export let link;
@@ -12,6 +23,11 @@
 
   let searchTerm;
 
+  /**
+   * Highlight the network of related organisational involvement nearby.
+   * It will take the current search term and highlight the points that have the same term in their excerpt.
+   * It will also draw lines between the current point and the highlighted points.
+   */
   async function highlightNetwork() {
     let width = 200;
     let height = 200;
@@ -139,3 +155,4 @@
     background: antiquewhite;
   }
 </style>
+

@@ -3,9 +3,6 @@
   import Timeline from "$lib/Timeline.svelte";
   import RightBar from "$lib/RightBar.svelte";
 
-  export let eventsInHighlight;
-  export let searchRange;
-  export let map;
 </script>
 
 <div class="h-screen py-5">
@@ -33,7 +30,7 @@
     </h3>
 
     <div class="overflow-y-scroll h-full">
-      <RightBar {eventsInHighlight} bind:searchRange />
+      <RightBar />
     </div>
   </div>
 </div>

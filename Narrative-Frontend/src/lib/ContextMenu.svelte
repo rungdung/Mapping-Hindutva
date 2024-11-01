@@ -1,15 +1,52 @@
 <script>
-  import { fade } from "svelte/transition";
-
-  export let searchRange;
+  /**
+   * A context menu that appears on right-click.
+   * Provides a search range slider and a freeze button.
+   * When the freeze button is clicked, the map is frozen and the search range is disabled.
+   * When the freeze button is clicked again, the map is unfrozen and the search range is enabled.
+   */
+  import { fade } from "svelte/transition"
+  import {searchRange} from "./stores"
+  /**
+   * The mouse position of the context menu.
+   * @type {number[]}
+   */
   let mousePosition;
+  /**
+   * Whether the context menu is visible.
+   * @type {boolean}
+   */
   let contextmenu = false;
+  /**
+   * The timeout for the context menu.
+   * @type {number}
+   */
   let rightClickTimeout;
+  /**
+   * Whether the map is frozen.
+   * @type {boolean}
+   */
   let freezeStatus = false;
+  /**
+   * The context menu element.
+   * @type {HTMLElement}
+   */
   let contextMenuElement;
+  /**
+   * The event listener for clicks outside of the context menu.
+   * @type {EventListener}
+   */
   let clickEventListener;
+  /**
+   * The event listener for mouse moves outside of the context menu.
+   * @type {EventListener}
+   */
   let moveoutEventListener
 
+  /**
+   * Create the context menu on right-click.
+   * @param {MouseEvent} e The right-click event.
+   */
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     document.removeEventListener("click", clickEventListener);
@@ -35,6 +72,9 @@
     });
   };
 
+  /**
+   * Toggle the freeze status of the map.
+   */
   const toggleFreeze = () => {
     const mapContainer = document.getElementById("map");
 
@@ -62,7 +102,7 @@
     transition:fade
   >
     <div class="slidecontainer">
-      <label for="search-range">Search Range: {searchRange}km</label>
+      <label for="search-range">Search Range: {$searchRange}km</label>
       <input
         type="range"
         id="search-range"
@@ -70,7 +110,7 @@
         max="300"
         step="1"
         class="w-full px-auto"
-        bind:value={searchRange}
+        bind:value={$searchRange}
       />
     </div>
     <button

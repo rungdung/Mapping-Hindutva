@@ -23,7 +23,15 @@ dist-ssr
 *.sln
 *.sw?
 
+
 # Local Netlify folder
 .netlify
 
 .venv
+Narrative-Frontend/build
+Narrative-Frontend/.svelte-kit
+Scraper/data/openai_batching_manual
+Scraper/data/openai_responses
+Scraper/data/archive
+/assets/
+.obsidian/
