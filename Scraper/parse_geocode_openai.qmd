@@ -1,0 +1,456 @@
+```{python}
+from openai import OpenAI
+import pandas as pd
+from pydantic import BaseModel
+import torch
+from prompt_optimizer.poptim import PunctuationOptim, EntropyOptim, LemmatizerOptim, PulpOptim
+
+torch.device('cpu')
+
+e_optimizer = EntropyOptim(verbose=True, p=0.1)
+l_optimizer = LemmatizerOptim()
+pulp_optimizer = PulpOptim()
+p_optimizer = PunctuationOptim()
+
+openai_key = "***REMOVED***"
+
+db = pd.read_csv('./data/HWdb_23_09_2024_geocoded.csv')
+
+# get a unique list of category_slugs and count the occurence of each
+dbCount = db['category_slug'].value_counts()
+
+# find numbre of null categor_slug
+dbNull = db[db['category_slug'].isnull()]
+# randomly select
+dbtest = db.sample(n=10)
+
+client = OpenAI(api_key=openai_key)
+
+class Location(BaseModel):
+    address: str
+    district: str
+    state: str
+    country: str
+
+class HindutvaEvent(BaseModel):
+    location: list[Location]
+    dateOfEvent: str
+    involvedGroups: list[str]
+    typeOfEvent: str
+
+globalDb = []
+for row in dbtest.itertuples():
+    optimized_prompt = p_optimizer(row.content)
+    # remove stop words
+    
+    # stop at 700 words
+
+    print(optimized_prompt)
+    completion = client.beta.chat.completions.parse(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content":"You are going to be fed news articles about events mostly in india. You must detect if it is about a real event, opinion article, or an event in the past. You must then detect the locations pertinent to that event (with the place name, district, state if available)(if it is multiple, list all event locations in [exact point of interest, place name, district, state] format), the date, and involved entities"},
+            {"role": "user", "content": '{content}'.format(content=optimized_prompt)},
+        ],
+        response_format=HindutvaEvent,
+        temperature=0.0,
+        max_tokens=300,
+
+    )
+
+    # save as json
+    print(completion.choices[0].message.content)
+    print(completion.usage.total_tokens)
+
+# append to db
+
+dbtest['openAi_response'] = globalDb
+dbtest.to_csv('./data/test.csv', index=False)
+m
+```
+
+
+```{python}
+# create a batch file for openAi
+import pandas as pd
+import json
+from openai import OpenAI
+
+db = pd.read_csv('./data/HWdb_23_09_2024_geocoded.csv')
+# check for duplicate titles
+db = db.drop_duplicates(subset='content')
+db = db.drop_duplicates(subset='id_x')
+
+# clean and sanitize content
+escapes = ''.join([chr(char) for char in range(1, 32)])
+translator = str.maketrans('', '', escapes)
+db.content = db.content.apply(lambda x: x.translate(translator) if isinstance(x, str) else x)
+
+db.to_csv('./data/HWdb_23_09_2024_geocoded_cleaned.csv', index=False)
+
+# randomly select
+# dbtest = db.sample(n=100)
+
+#write to json file
+with open('./data/HWdb_23_09_2024_openaibatch.jsonl', 'w') as f:
+    for row in db.itertuples():
+        f.write('''{{
+        "custom_id": "{id}", 
+        "method": "POST", 
+        "url": "/v1/chat/completions", 
+        "body": {{
+            "model": "gpt-4o-mini", 
+            "messages": [
+                {{
+                    "role": "system", 
+                    "content": "You are going to be fed news articles about events mostly in India. You must detect if it is about a real event, opinion article, or an event in the past. You must then detect the locations pertinent to that event (with the place name, district, state if available) (if it is multiple, list all event locations in [exact point of interest, place name, district, state] format), the date, and involved entities."
+                }},
+                {{
+                    "role": "user", 
+                    "content": "{content}"
+                }}
+            ],
+            "response_format": {{
+            "type": "json_schema",
+            "json_schema": {{
+                "name": "event",
+                "strict": true,
+                "schema": {{
+                    "$defs": {{
+                        "Location": {{
+                            "properties": {{
+                                "address": {{"title": "Address", "type": "string"}},
+                                "district": {{"title": "District", "type": "string"}},
+                                "state": {{"title": "State", "type": "string"}},
+                                "country": {{"title": "Country", "type": "string"}}
+                            }},
+                            "required": ["address", "district", "state", "country"],
+                            "additionalProperties": false,
+                            "title": "Location",
+                            "type": "object"
+                        }}
+                    }},
+                    "properties": {{
+                        "location": {{
+                            "items": {{
+                                "$ref": "#/$defs/Location"
+                            }},
+                            "title": "Location",
+                            "type": "array"
+                        }},
+                        "dateOfEvent": {{"title": "DateOfEvent", "type": "string"}},
+                        "involvedGroups": {{
+                            "items": {{"type": "string"}},
+                            "title": "InvolvedGroups",
+                            "type": "array"
+                        }},
+                        "typeOfEvent": {{"title": "TypeOfEvent", "type": "string"}}
+                    }},
+                    "additionalProperties": false,
+                    "required": ["location", "dateOfEvent", "involvedGroups", "typeOfEvent"],
+                    "title": "HindutvaEvent",
+                    "type": "object"
+                }}
+            }}
+        }}
+        }} 
+    }}
+    '''.format(id=row.Index_x, content=row.content.replace('"', '\\"')).replace('\n', '').replace('“', '\\"').replace('”', '\\"') + '\n')
+
+# read each line in json
+#if invalid json,
+# drop
+# save
+with open('./data/HWdb_23_09_2024_openaibatch.jsonl', 'r') as f:
+    lines = f.readlines()
+
+with open('./data/HWdb_23_09_2024_openaibatch.jsonl', 'w') as f:
+    for line in lines:
+        try:
+            json.loads(line)
+            f.write(line)
+        except:
+            print(line)
+
+
+
+
+
+```
+
+```{python}
+#upload
+
+from openai import OpenAI
+import pandas as pd
+import json
+
+openai_key = "***REMOVED***"
+
+client = OpenAI(api_key=openai_key)
+
+# split the file into 1000line chunks and save as individual files
+
+with open('./data/HWdb_23_09_2024_openaibatch_13000_0.jsonl', 'r') as f:
+    file = f.readlines()
+
+    for i in range(0, len(file), 500):
+        with open('./data/HWdb_23_09_2024_openaibatch_13000_0.jsonl'.format(i=i), 'w') as f:
+            f.write(''.join(file[i:i+500]))
+
+
+
+## batch file by file
+
+batch_input_file = client.files.create(
+  file=open("./data/HWdb_23_09_2024_openaibatch_13000_0.jsonl", "rb"),
+  purpose="batch"
+)
+
+batch_input_file_id = batch_input_file.id
+
+client.batches.create(
+    input_file_id=batch_input_file_id,
+    endpoint="/v1/chat/completions",
+    completion_window="24h",
+    metadata={
+      "description": "batch14.first"
+    }
+)
+
+## test
+
+client.batches.retrieve("batch_671110b0509c8190b1c754b6018fcff4")
+
+## write file 
+
+file_response = client.files.content("file-tmz7a4roB9ApMKtmEm6NvEV1")
+
+with open ('./data/openai_responses/HWdb_23_09_2024_openaibatch_13000.jsonl', 'w') as f:
+    f.write(file_response.text)
+
+client.batches.list()
+
+
+# batch 1: batch_670e708208c88190a4eec2e98e65e500 file-PDeNiot8aXPEwWlJw6a00Fgb
+# batch 2: batch_670e70ded5848190ad15fc5068262a01 file-Q1tFAowanJF5fxwYVqeIllZm
+# batch 3: batch_670e7125cdf4819097813eddeb3e2bb3 file-EuGD3LlmRrkt7LDgjdboL81a
+# batch 4: batch_670e715376d48190937a690f3b38a6d3 file-VBACRd1ws0kShFCf8821NOli
+# batch 5: batch_670e77afac3c8190b71a92b7b6f82237 file-AFEVxvwWeg6uOAmeFqd0MJY8
+# batch 6: batch_670e77d317308190b950f4d2b01c064e file-UHjNd4wDWds75Re9WGszFpNA
+# batch 7: batch_670e78027e0481909e5cd3dadd2f0269 file-OyYvOpzwuMTHysq1QZwPThRZ
+# batch 8: batch_670e7ee3df548190bc9daf72e9461265 file-BONMHzicsOP3cJMOcFfEUKM7
+# batch 9: batch_670e84ec78cc8190beea266a69d1676c file-TrxEbvBC6AyR4F5dCUj9DAY5
+# batch 10: batch_670e979f0db881909cc8cbc146bb5ee7 file-OsUapxhKdQCcl8MGJqymjbP3
+# batch 11: batch_670f401ed45881909b683a053a918de5 file-12WHSHtO1D90Xtez54bNZ3Zk
+# batch 12: batch_670f4e2f343081908eb0caeab43a9729 file-PwZQ4sw7cdNf3z7ItVXM0ty3
+# batch 13: batch_670f685dec68819082317c9ef4972efc file-JuOxT9hRlWw37WbMPz85DUtr
+# batch 14.0: batch_671110b0509c8190b1c754b6018fcff4 file-tmz7a4roB9ApMKtmEm6NvEV1
+# batch 14.5: batch_6710f6bfc6c4819092013d14ee5850b0 file-LqG9G9FrxG36ggG7pfSYHU2G
+# batch 15: batch_6710f5494c38819084522c78e6f8c4f7 file-CQkVSbic35D3nfZGpsuhkmye
+
+```
+
+```{python}
+import ast
+import pandas as pd
+
+# read all json files in dir
+dir = './data/openai_responses/'
+json_files = [f for f in os.listdir(dir) if f.endswith('.jsonl')]
+
+df_list = []
+for f in json_files:
+    df_list.append(pd.read_json(f'{dir}/{f}', lines=True))
+
+df = pd.concat(df_list)
+
+# preserve only unique custom_id
+df = df.drop_duplicates(subset=['custom_id'])
+
+df_exploded = []
+
+def checkIntorStr(x):
+    try:
+        x = int(x)
+        return x
+    except:
+        return None
+# flatten the dataframe
+for row in df.to_dict(orient="records"):
+    content = ast.literal_eval(row['response']['body']['choices'][0]['message']['content'])
+    new_row = {
+        'openai_id': row['id'],
+        'id': checkIntorStr(row['custom_id']),
+        'locations': content['location'],
+        'date': content['dateOfEvent'],
+        'involved_groups': content['involvedGroups']
+    }
+
+    df_exploded.append(new_row)
+
+df_exploded_full = pd.DataFrame(df_exploded)
+# drop all rows with no id
+df_exploded_full.dropna(subset=['id'], inplace=True)
+
+# join with the original dataframe
+df_og = pd.read_csv('./data/HWdb_23_09_2024_geocoded_cleaned.csv')
+df_og.rename(columns={'id_x': 'id'}, inplace=True)
+df_og['id'] = df_og['id'].apply(lambda x: checkIntorStr(x))
+df_og.dropna(subset=['id'], inplace=True)
+df_og['id'] = df_og['id'].astype(int)
+df_exploded_full['id'] = df_exploded_full['id'].astype(int)
+
+# get unique list of ids and see how many match
+exploded_ids = df_exploded_full['id'].unique()
+og_ids = df_og['id'].unique()
+print(len(exploded_ids))
+print(len(og_ids))
+# remove ids that are not in both lists
+missing_ids = set(og_ids) - set(exploded_ids)
+
+df_og.set_index('id', inplace=True)
+df_exploded_full.set_index('id', inplace=True)
+df_joined = df_exploded_full.join(df_og, on='id', how='left', lsuffix='_openai', rsuffix='_hw')
+
+
+# # count null values
+df_joined.dropna(subset=['locations'], inplace=True)
+# df_joined.to_csv('./data/HWdb_23_09_2024_openai_merged.csv', index=False)
+```
+
+
+```{python}
+
+# get all numeric values only
+# df_exploded_full = df_exploded_full.loc[df_exploded_full['id'].str.isnumeric()]
+
+# df_exploded_full.to_csv('./data/openai_responses/full_batch.csv')
+# df_exploded_full = pd.read_csv('./data/openai_responses/full_batch.csv')
+
+# manually join
+df_join_list = []
+
+for row in df_exploded_full.itertuples():
+    new_row = {
+        'openai_id': row.openai_id,
+        'id': row.Index,
+        'locations_openai': row.locations,
+        'date_openai': row.date,
+        'involved_groups_openai': row.involved_groups,
+        'title': df_og.at[row.Index, 'title'],
+        'excerpt': df_og.at[row.Index, 'excerpt'],
+        'content': df_og.at[row.Index, 'content'],
+        'category_slug': df_og.at[row.Index, 'category_slug'],
+        'link': df_og.at[row.Index, 'link'],
+        'date': df_og.at[row.Index, 'date'],
+    }
+    df_join_list.append(new_row)
+
+df_joined_manual = pd.DataFrame(df_join_list)
+df_joined_manual.dropna(subset=['locations_openai', 'content'], inplace=True)
+df_joined_manual.to_csv('./data/HWdb_23_09_2024_openai_merged_manual.csv', index=False)
+```
+
+
+```{python}
+import pandas as pd
+import ast
+import time
+import logging
+logging.basicConfig(level=logging.DEBUG)
+from geopy.geocoders import GoogleV3
+import geopandas as gpd
+mapsapi = "AIzaSyB9axtHOI6YPHquTaXpc3rynJ-P3XLHwWA"
+
+df = pd.read_csv('./data/HWdb_23_09_2024_openai_merged_manual.csv')
+
+geolocator = GoogleV3(api_key=mapsapi)
+
+def getNaturalLocations(x):
+    listLocations = []
+    try:
+        locations = ast.literal_eval(x)
+        for location in locations:
+            # enter the object and get only the values of the key:value pair
+            location_str = str(location['address'] + ', ' + location['district'] + ', ' + location['state'] + ', ' + location['country'])
+            location_str.replace("'", "")
+            print(location_str)
+            listLocations.append(location_str)
+        return listLocations
+    except:
+        return None
+
+df['natural_locations_openai'] = df['locations_openai'].apply(lambda x: getNaturalLocations(x))
+
+# explode 
+df_ = df.explode('natural_locations_openai')
+
+# clean text
+def clean_text(text):
+    # check if string
+    try:
+        text = str(text)
+        # clean out N/A and Not available
+        if "N/A" in text:
+            return None
+        if "Not available" in text:
+            return None
+        if "Not specified" in text:
+            return None
+        # if less than 5 chars or empty
+        if "nan" in text:
+            return None
+        return text
+    except:
+        return None
+    
+
+df_['natural_locations_openai'] = df_['natural_locations_openai'].apply(lambda x: clean_text(x))
+df_.dropna(subset=['natural_locations_openai'], inplace=True)
+
+
+# get unique list of locations
+list_locations = df_['natural_locations_openai'].unique()
+
+# save 
+with open('./data/unique_locations_openai.txt', 'w') as f:
+    f.write('\n'.join(list_locations))
+
+# loop over all locations
+# make df
+list_locations_geocoded = []
+
+for location in list_locations[len(list_locations_geocoded):]:
+    try:
+        new_row = {
+            'location': location,
+            'coords': geolocator.geocode(location)[1]
+        }
+        list_locations_geocoded.append(new_row)
+        print(new_row)
+    except:
+        print("Could not geocode location: " + location)
+    time.sleep(0.5)
+
+df_locations = pd.DataFrame(list_locations_geocoded)
+df_locations.to_csv('./data/unique_locations_openai_geocoded.csv', index=False)
+
+def get_coords(x):
+    try:
+        return df_locations.loc[df_locations['location'] == x, 'coords'].values[0]
+    except:
+        print(x)
+        return None
+df_['coords'] = df_['natural_locations_openai'].apply(lambda x: get_coords(x))
+df_.dropna(subset=['coords'], inplace=True)
+
+# parse as geopandas
+df_geo = gpd.GeoDataFrame(df_, geometry=gpd.points_from_xy(df_['coords'].str[1], df_['coords'].str[0]))
+df_geo.to_csv('./data/HWdb_23_09_2024_openai_geocoded_final.csv', index=False)
+# drop needless cols
+df_geo.drop(columns=['coords', 'locations_openai', 'openai_id', 'content'], inplace=True)
+df_geo.to_file('./data/HWdb_23_09_2024_openai_geocoded_final.geojson', driver='geojson')
+
+## keep only 
+```
