@@ -1,15 +1,5 @@
 <script>
-  /**
-   * This component creates a canvas element and draws a circle on it.
-   * It then adds the canvas as a source to the map and uses it to create
-   * a buffer around the user's mouse position.
-   * When the user moves the mouse, it updates the buffer and uses it to
-   * select the events that are within the buffer.
-   * The selected events are then displayed on the map as red circles.
-   *
-   */
-
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import {
     buffer,
     point,
@@ -17,24 +7,34 @@
     bboxPolygon,
     pointsWithinPolygon,
   } from "@turf/turf";
-
   import {
     eventsInHighlight,
     searchRange,
     map,
     resourceBlob,
     loadStatus,
+    lookingGlassBool
   } from "./stores.js";
 
-  let debounceTimer;
+  // Improved debounce function with clear type and parameters
+  function debounce(func, wait = 50) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
 
-  /**
-   * Draws a circle on the canvas element.
-   * The circle is centered at the center of the canvas and has a radius
-   * that is half the width of the canvas.
-   */
+  let canvas;
+  let mouseMoveUnsubscribe;
+
   const drawCircle = () => {
-    const canvas = document.getElementById("circleCanvas");
+    if (!canvas) return;
+    
     canvas.style.display = "none";
     const ctx = canvas.getContext("2d");
     const centerX = canvas.width / 2;
@@ -50,16 +50,20 @@
     ctx.fill();
     ctx.stroke();
 
+    // Extract coordinate setting to a separate function for clarity
+    const bufferCoordinates = [
+      [75.99829734320153, 22.95840468059591],
+      [77.96495488768724, 22.95840468059591],
+      [77.96495488768724, 24.75704540804498],
+      [75.99829734320153, 24.75704540804498],
+    ];
+
     $map.addSource("buffer", {
       type: "canvas",
-      canvas: "circleCanvas",
-      coordinates: [
-        [75.99829734320153, 22.95840468059591],
-        [77.96495488768724, 22.95840468059591],
-        [77.96495488768724, 24.75704540804498],
-        [75.99829734320153, 24.75704540804498],
-      ],
+      canvas: canvas,
+      coordinates: bufferCoordinates,
     });
+
     $map.addLayer({
       id: "buffer",
       type: "raster",
@@ -73,6 +77,7 @@
         features: [],
       },
     });
+
     $map.addLayer({
       id: "highlights",
       type: "circle",
@@ -82,38 +87,61 @@
         "circle-opacity": 0.5,
         "circle-radius": 5,
       },
-    })
+    });
   };
 
-  $: if ($loadStatus.dataLoaded) {
-    /**
-     * When the user moves the mouse, update the buffer and use it to
-     * select the events that are within the buffer.
-     */
-    $map.on("mousemove", async (e) => {
-      let mousePosition = [e.lngLat.lng, e.lngLat.lat];
-      let bufferPolygon = buffer(point(mousePosition), $searchRange);
-      let bboxBuffer = bboxPolygon(bbox(bufferPolygon.geometry)).geometry
-        .coordinates[0];
-      bboxBuffer.pop();
-
-      $map.getSource("buffer").setCoordinates(bboxBuffer);
-
-      // debounce the function
-      if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(async () => {
-        $eventsInHighlight = pointsWithinPolygon($resourceBlob, bufferPolygon);
-        $map.getSource("highlights").setData({
-          type: "FeatureCollection",
-          features: $eventsInHighlight.features,
-        });
-      }, 10);
+  // Separate function for handling mouse move logic
+  const handleMouseMove = async (e) => {
+    const mousePosition = [e.lngLat.lng, e.lngLat.lat];
+    const bufferPolygon = buffer(point(mousePosition), $searchRange);
+    
+    // Use optional chaining and nullish coalescing for safety
+    const bboxBuffer = bboxPolygon(bbox(bufferPolygon.geometry))?.geometry?.coordinates?.[0] ?? [];
+    
+    // Remove last coordinate to close polygon
+    bboxBuffer.pop();
+    
+    // Safely update sources
+    $map.getSource("buffer")?.setCoordinates(bboxBuffer);
+    
+    $eventsInHighlight = pointsWithinPolygon($resourceBlob, bufferPolygon);
+    $map.getSource("highlights")?.setData({
+      type: "FeatureCollection",
+      features: $eventsInHighlight.features,
     });
+  };
+
+  // Use the debounced version of handleMouseMove
+  const debouncedMouseMove = debounce(handleMouseMove, 5);
+
+  // Reactive statement to set up mouse move listener
+  $: if ($loadStatus.dataLoaded && $map) {
+    // Remove previous listener if exists
+    if (mouseMoveUnsubscribe) {
+      mouseMoveUnsubscribe();
+    }
+    
+    // Add new listener
+    $map.on("mousemove", debouncedMouseMove);
+    mouseMoveUnsubscribe = () => $map.off("mousemove", debouncedMouseMove);
   }
 
   onMount(() => {
     drawCircle();
   });
+
+  onDestroy(() => {
+    // Clean up event listener
+    if (mouseMoveUnsubscribe) {
+      mouseMoveUnsubscribe();
+    }
+  });
 </script>
 
-<canvas id="circleCanvas" class="circleCanvas" width="800" height="800" />
+<canvas 
+  bind:this={canvas} 
+  id="circleCanvas" 
+  class="circleCanvas" 
+  width="800" 
+  height="800" 
+/>

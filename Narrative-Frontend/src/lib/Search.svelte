@@ -12,18 +12,14 @@
 
   import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
+  import { map} from "./stores";
 
   /**
    * The search query.
    * @type {string}
    */
-  let searchQuery;
+  export let searchQuery;
 
-  /**
-   * The map object.
-   * @type {maplibre.Map}
-   */
-  export let map;
 
   /**
    * Searches for events in the map.
@@ -32,47 +28,56 @@
    * The matching events are then added to a new layer called "hwdb-highlight"
    * and styled as red circles.
    */
-  export function searchLayer() {
+  export function searchLayer(searchQuery) {
     /**
      * The features that match the search query.
      * @type {Array<maplibre.Feature>}
      */
+
+     try {
+      searchQuery = searchQuery[1]
     let toBehighlighted = [],
       features;
     // query the layer for the existence of a keyword in teh title
     // get random points from nearby
-    let getNearbyFeatures = map.queryRenderedFeatures({
-      layers: ["point"],
+    let getNearbyFeatures = $map.queryRenderedFeatures({
+      layers: ["point"], 
     });
 
     // loop through the properties
     // if the property exists, add it to the highlight layer
-    getNearbyFeatures.forEach((element) => {
-      if (
+getNearbyFeatures.forEach((element) => {
+  try {
+    if (
         element.properties.excerpt
           .toLowerCase()
           .includes(searchQuery.toLowerCase())
       ) {
         toBehighlighted.push(element);
       }
-    });
+  } catch (e) {
+    console.error(`Failed to forwardGeocode with error: ${e}`);
+  }
+     
+    })
+
 
     // create a duplicate source for the highlight
-    if (map.getSource("hwdb-highlight")) {
-      features = map
+    if ($map.getSource("hwdb-highlight")) {
+      features = $map
         .getSource("hwdb-highlight")
         .setData({ type: "FeatureCollection", features: toBehighlighted })[
         "_data"
       ]["features"];
     } else {
-      map.addSource("hwdb-highlight", {
+      $map.addSource("hwdb-highlight", {
         type: "geojson",
         data: {
           type: "FeatureCollection",
           features: "",
         },
       });
-      map.addLayer({
+      $map.addLayer({
         id: "hwdb-highlight",
         type: "circle",
         source: "hwdb-highlight",
@@ -82,16 +87,21 @@
           "circle-opacity": 0.5,
         },
       });
-      features = map
+      features = $map
         .getSource("hwdb-highlight")
         .setData({ type: "FeatureCollection", features: toBehighlighted })[
         "_data"
       ]["features"];
     }
+     } catch (e) {
+      console.error(`Failed to forwardGeocode with error: ${e}`);
+    }
+    
   }
+  searchLayer(searchQuery)
 </script>
 
-<div class="w-full flex">
+<!-- <div class="w-full flex">
   <input
     type="text"
     id="search-input"
@@ -104,5 +114,5 @@
     class=" !text-black px-1 py-0 m-1 bg-gray-300"
     id="search-button">Search</button
   >
-</div>
+</div> -->
 

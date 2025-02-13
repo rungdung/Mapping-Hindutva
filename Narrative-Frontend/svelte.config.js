@@ -13,6 +13,11 @@ const config = {
     mdsvex({
       extensions: ['.md', '.svx'],
     })
-  ]
+  ],
+  compilerOptions: {
+		compatibility: {
+			componentApi: 4
+		}
+	}
 };
 export default config;

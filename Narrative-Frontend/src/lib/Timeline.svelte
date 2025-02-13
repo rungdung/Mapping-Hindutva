@@ -1,11 +1,8 @@
-<script>
+<!-- <script>
     import milestones from "d3-milestones";
     import "d3-milestones/build/d3-milestones.css";
     import { onMount } from "svelte";
-    import { xlink_attr } from "svelte/internal";
-
-    export let eventsInHighlight;
-
+    import {eventsInHighlight} from './stores'
     // convert into an array of objects
     let events = [];
 
@@ -37,4 +34,4 @@
     #timeline {
         @apply text-white;
     }
-</style>
+</style> -->

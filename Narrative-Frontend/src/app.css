@@ -51,12 +51,12 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2em;
   line-height: 1.1;
 }
 
 h2 {
-  font-size: 1.8em;
+  font-size: 1.6em;
   line-height: 1.1;
   @apply mb-2 mt-4
 }
@@ -105,4 +105,13 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+.title {
+  font-family: Junicode;
+  font-variation-settings:
+    "wght" 600,
+    "wdth" -70;
+  line-height: 1.6rem;
+  font-size: 2rem;
+  word-break: normal;
 }

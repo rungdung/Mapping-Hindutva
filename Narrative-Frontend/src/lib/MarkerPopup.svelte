@@ -12,6 +12,8 @@
    * @param {array} coordinates - The coordinates of the point.
    * @param {string} locations - The related locations.
    */
+
+   import * as Turf from "@turf/turf";
   export let title;
   export let date;
   export let link;
@@ -116,10 +118,10 @@
 </script>
 
 <div class="popup">
-  <h3 class="text-md">{@html title}</h3>
+  <h4 class="text-xs">{@html title}</h4>
   <p>{date}</p>
   <a href={link}>Link to article</a>
-  <p class="text-xs">{@html excerpt}</p>
+  <div class="text-xs excerpt-text">{@html excerpt}</div>
   <br />
   <p>Related locations</p>
 
@@ -146,13 +148,22 @@
 
 <style lang="postcss">
   .popup {
-    @apply text-black text-left p-3 rounded-md;
+    @apply text-black text-left p-3 rounded-md ;
   }
+
+  :global(.excerpt-text p) {
+    @apply !text-xs;
+  }
+  .popup p{
+    font-size: 0.7rem;
+  }
+  
   :global(.maplibre-gl-popup-close-button) {
     @apply text-black bg-neutral-700;
   }
   :global(.maplibregl-popup-content) {
     background: antiquewhite;
+    @apply w-[30vw];
   }
 </style>
 

@@ -12,13 +12,12 @@
   import ResourceLayer from "./ResourceLayer.svelte";
   import CircleOverlay from "./CircleOverlay.svelte";
   import ContextMenu from "./ContextMenu.svelte";
-  import { map, searchRange } from "./stores.js";
+  import { lookingGlassBool, map, searchRange } from "./stores.js";
 
   // Public API key for Maptiler
   const publicMaptilerKey = "XtQybTQjRpKFSRHVSG0G";
-  let mapContainer;
   let mapLoaded = false;
-
+  let mapContainer;
   /**
    * Geocoder API for forward geocoding using Nominatim
    */
@@ -76,6 +75,8 @@
       new MaplibreGeocoder(geocoderApi, { map: $map }),
     );
 
+    $map.addControl(new maplibre.NavigationControl());
+
     // Handle map load event
     $map.on("load", () => {
       // Load ResourceLayer
@@ -90,13 +91,15 @@
     if ($map) $map.remove();
   });
 </script>
-
+<ContextMenu />
 <section id="map" class="h-screen">
-  <div class="h-full w-full" bind:this={mapContainer}></div>
+  <div class="h-full w-full" bind:this={mapContainer}>
   {#if mapLoaded}
     <ResourceLayer />
+    {#if $lookingGlassBool}
     <CircleOverlay />
-    <ContextMenu />
+    {/if}
   {/if}
+</div>
 </section>
 

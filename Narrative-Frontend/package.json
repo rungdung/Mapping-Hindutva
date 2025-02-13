@@ -10,10 +10,11 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
+    "@vincjo/datatables": "^2.0.5",
     "autoprefixer": "^10.4.20",
     "mdsvex": "^0.12.3",
     "postcss": "^8.4.47",
-    "svelte": "^4.2.19",
+    "svelte": "^5.2.7",
     "tailwindcss": "^3.4.13"
   },
   "dependencies": {
@@ -26,16 +27,12 @@
     "@sveltejs/kit": "^2.6.4",
     "@turf/collect": "^6.5.0",
     "@turf/turf": "^6.5.0",
+    "carbon-components-svelte": "^0.86.0",
     "d3-milestones": "^1.4.7",
-    "drawflow": "^0.0.59",
-    "leaflet": "^1.9.3",
-    "leaflet-search": "^3.0.9",
-    "leaflet.markercluster": "^1.5.3",
     "litegraph": "^0.0.0",
     "litegraph.js": "^0.7.12",
     "maplibre-gl": "^4.0.0",
     "svelte-collapsible": "^0.2.1",
-    "svelvet": "^7.0.48",
     "vite": "^5.4.8"
   }
 }
