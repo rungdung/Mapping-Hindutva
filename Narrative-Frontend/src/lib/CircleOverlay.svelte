@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+
   import {
     buffer,
     point,
@@ -7,34 +8,24 @@
     bboxPolygon,
     pointsWithinPolygon,
   } from "@turf/turf";
+
   import {
     eventsInHighlight,
     searchRange,
     map,
     resourceBlob,
     loadStatus,
-    lookingGlassBool
+    lookingGlassBool,
   } from "./stores.js";
 
-  // Improved debounce function with clear type and parameters
-  function debounce(func, wait = 50) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
+  import { debounce } from "$lib/utils.js";
 
   let canvas;
   let mouseMoveUnsubscribe;
 
   const drawCircle = () => {
     if (!canvas) return;
-    
+
     canvas.style.display = "none";
     const ctx = canvas.getContext("2d");
     const centerX = canvas.width / 2;
@@ -94,16 +85,18 @@
   const handleMouseMove = async (e) => {
     const mousePosition = [e.lngLat.lng, e.lngLat.lat];
     const bufferPolygon = buffer(point(mousePosition), $searchRange);
-    
+
     // Use optional chaining and nullish coalescing for safety
-    const bboxBuffer = bboxPolygon(bbox(bufferPolygon.geometry))?.geometry?.coordinates?.[0] ?? [];
-    
+    const bboxBuffer =
+      bboxPolygon(bbox(bufferPolygon.geometry))?.geometry?.coordinates?.[0] ??
+      [];
+
     // Remove last coordinate to close polygon
     bboxBuffer.pop();
-    
+
     // Safely update sources
     $map.getSource("buffer")?.setCoordinates(bboxBuffer);
-    
+
     $eventsInHighlight = pointsWithinPolygon($resourceBlob, bufferPolygon);
     $map.getSource("highlights")?.setData({
       type: "FeatureCollection",
@@ -120,7 +113,7 @@
     if (mouseMoveUnsubscribe) {
       mouseMoveUnsubscribe();
     }
-    
+
     // Add new listener
     $map.on("mousemove", debouncedMouseMove);
     mouseMoveUnsubscribe = () => $map.off("mousemove", debouncedMouseMove);
@@ -138,10 +131,10 @@
   });
 </script>
 
-<canvas 
-  bind:this={canvas} 
-  id="circleCanvas" 
-  class="circleCanvas" 
-  width="800" 
-  height="800" 
+<canvas
+  bind:this={canvas}
+  id="circleCanvas"
+  class="circleCanvas"
+  width="800"
+  height="800"
 />

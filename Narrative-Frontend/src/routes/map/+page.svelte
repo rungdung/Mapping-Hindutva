@@ -12,7 +12,6 @@
   onMount(() => {
     let params = new URLSearchParams(window.location.search);
     let displayType = params.get("view");
-    console.log(displayType);
     if (displayType == "looking_glass") {
       $lookingGlassBool = true;
     } else if (displayType == "map") {
@@ -26,7 +25,7 @@
 </div>
 <div class="grid grid-cols-[3fr_2fr] z-10 w-screen">
   <MapContainer />
-  <RightBar/>
+  <RightBar />
 </div>
 
 <Modal
