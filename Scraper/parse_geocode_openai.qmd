@@ -12,7 +12,7 @@ l_optimizer = LemmatizerOptim()
 pulp_optimizer = PulpOptim()
 p_optimizer = PunctuationOptim()
 
-openai_key = "***REMOVED***"
+openai_key = import.env("OPENAI_API_KEY")
 
 db = pd.read_csv('./data/HWdb_23_09_2024_geocoded.csv')
 
@@ -185,7 +185,7 @@ from openai import OpenAI
 import pandas as pd
 import json
 
-openai_key = "***REMOVED***"
+openai_key = "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"
 
 client = OpenAI(api_key=openai_key)
 
