@@ -23,7 +23,6 @@
    * @type {boolean}
    */
   let freezeStatus = false;
-  let mapInteractivity = ["1"];
 
   /**
    * Toggle the freeze status of the map.
@@ -45,21 +44,16 @@
   };
 
   const toggleInteractivity = (mapInteractivity) => {
-    console.log(mapInteractivity)
     try {
-      if  (mapInteractivity[0] == "1") {
-      $lookingGlassBool = true
-    } else {
-      $lookingGlassBool = false
+      if ($lookingGlassBool == false) {
+        $lookingGlassBool = true;
+      } else {
+        $lookingGlassBool = false;
+      }
+    } catch (error) {
+      console.log(error);
     }
-    }
-    catch (error) {
-      console.log(error)
-    }
-  
   };
-
-  $:toggleInteractivity(mapInteractivity)
 </script>
 
 <ContextMenu>
@@ -80,9 +74,12 @@
     on:click={toggleFreeze}
   ></ContextMenuOption>
 
-  <ContextMenuGroup bind:selectedIds={mapInteractivity} labelText="Map Interactivity">
-    <ContextMenuOption id="1" labelText="Looking glass search" selected/>
-  </ContextMenuGroup>
+  <ContextMenuOption
+    labelText={$lookingGlassBool
+      ? "Looking glass mode on"
+      : "Looking glass mode off"}
+    on:click={toggleInteractivity}
+  ></ContextMenuOption>
 </ContextMenu>
 
 <style>

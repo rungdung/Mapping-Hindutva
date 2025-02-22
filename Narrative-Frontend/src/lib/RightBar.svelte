@@ -12,28 +12,11 @@
     Pagination,
   } from "@vincjo/datatables/server";
 
-  import * as d3 from "d3";
-  import cloud from "d3-cloud";
-
-  import { debounce } from "$lib/utils.js";
-
   import { mount } from "svelte";
 
   import MarkerPopup from "./MarkerPopup.svelte";
 
-  let tableData_ = [
-    {
-      title: "Hello",
-      date: "2023-04-01",
-      involved: "Group A",
-      excerpt: "Excerpt",
-      link: "https://example.com",
-    },
-  ];
-
   let table;
-
-  let ldatopics = [];
 
   let involvedGroups = $state([]);
   let involvedGroupsFreq = $state([]);
@@ -70,29 +53,11 @@
   const { start, end, total } = $derived(table.rowCount);
   const search = table.createSearch();
 
-  // Reactive statement to update tableData when eventsInHighlight changes
-  let updateInvolvedGroups = () => {
-    $eventsInHighlight?.features?.forEach((event) => {
-      event.properties.involved_groups_openai.forEach((group) => {
-        involvedGroups.push(group.toLowerCase());
-      });
-    });
-
-    involvedGroupsFreq = involvedGroups.reduce(
-      (acc, e) => acc.set(e, (acc.get(e) || 0) + 1),
-      new Map()
-    );
-
-    createCanvas(involvedGroupsFreq);
-  };
-
-  let debouncedUpdate = debounce(updateInvolvedGroups, 1000);
-
   $effect(() => {
     if ($eventsInHighlight?.features?.length > 0) {
       table.invalidate();
       involvedGroups = [];
-      debouncedUpdate();
+      // debouncedUpdate();
     }
   });
 
@@ -118,41 +83,12 @@
       },
     });
   };
-
-  let createCanvas = (involvedGroupsFreq) => {
-    let words = [];
-    console.log(involvedGroupsFreq);
-    for (const entry of involvedGroupsFreq.entries()) {
-      words.push({
-        text: entry[0],
-        size: 60 + entry[1] * 8,
-      });
-    }
-
-    cloud()
-      .size([500, 500])
-      .canvas(canvas)
-      .words(words)
-      .padding(5)
-      .rotate(0) //() => Math.floor(Math.random() * 2) * 90)
-      .fontSize((d) => d.size)
-      .font("Lato, sans-serif")
-      .on("end", (words) => console.log(JSON.stringify(words)))
-      .start();
-  };
 </script>
 
 <div
   id="meta-info"
-  class="text-[#faf6eb] rounded-none overflow-y-auto mix-blend-darken py-5 max-h-screen"
+  class="text-[#faf6eb] rounded-none overflow-y-auto py-5 max-h-screen"
 >
-  <canvas
-    id="canvas"
-    style="color: black;"
-    width="100"
-    height="100"
-    bind:this={canvas}
-  ></canvas>
   <Datatable {table}>
     {#snippet header()}
       <div>
@@ -179,7 +115,12 @@
       oninput={() => search.set()}
       placeholder="Search for an event"
     />
-    <table>
+    <table class="scrollable w-100">
+      <colgroup>
+        <col span="1" style="width: 20%;" />
+        <col span="1" style="width: 15%;" />
+        <col span="1" style="width: 60%;" />
+      </colgroup>
       <thead class="bg-gray-300 text-xs">
         <tr>
           <ThSort {table} field="title" id="title">Title</ThSort>
@@ -194,7 +135,9 @@
           <tr onclick={() => handleClick(row)}>
             <td>{@html row.title}</td>
             <td>{row.date.slice(0, 10)}</td>
-            <td class="excerpt">{@html row.excerpt.replace("<p>", "")}</td>
+            <td class="excerpt w-[10vw]"
+              >{@html row.excerpt.replace("<p>", "")}</td
+            >
             <!-- <td>{row.involved}</td><td>{@html row.link}</td> -->
           </tr>
         {/each}
@@ -215,10 +158,7 @@
   table {
     table-layout: fixed;
   }
-  :global(table td.excerpt) {
-    overflow: hidden;
-    white-space: nowrap;
-  }
+
   th {
     text-align: left;
     background-color: black;

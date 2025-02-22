@@ -5,7 +5,7 @@
   import { lookingGlassBool } from "../../lib/stores";
   import { onMount } from "svelte";
   import { Button, Modal } from "carbon-components-svelte";
-
+  import Search from "../../lib/Search.svelte";
   let height;
   let modalOpen = true;
 
@@ -22,6 +22,7 @@
 
 <div id="" class="absolute left-2 top-2 z-20 !text-gray-600 w-[30vw] p-10">
   <LeftBar />
+  <Search />
 </div>
 <div class="grid grid-cols-[3fr_2fr] z-10 w-screen">
   <MapContainer />

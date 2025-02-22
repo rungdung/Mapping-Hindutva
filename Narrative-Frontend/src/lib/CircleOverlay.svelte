@@ -120,7 +120,9 @@
   }
 
   onMount(() => {
-    drawCircle();
+    if ($lookingGlassBool) {
+      drawCircle();
+    }
   });
 
   onDestroy(() => {

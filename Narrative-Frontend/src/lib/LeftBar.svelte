@@ -2,12 +2,11 @@
   import Search from "$lib/Search.svelte";
   import Timeline from "$lib/Timeline.svelte";
   import RightBar from "$lib/RightBar.svelte";
-
 </script>
 
 <div class="">
   <div class=" ">
-    <div class="mb-2 ">
+    <div class="mb-2">
       <h1 class="title text-xl">
         Spatial archive of Hindutva and related ethno violence
       </h1>
@@ -22,19 +21,15 @@
         </li>
       </nav>
 
-    <!-- <h3 class=" text-xs">
+      <!-- <h3 class=" text-xs">
       This is a prototype to explore linked stories of Hindutva, communal
       violence and related incidents. <br /> <br />
     </h3> -->
     </div>
-
-
   </div>
 </div>
 
 <style lang="postcss">
-
-
   #meta-info li a {
     @apply text-gray-600;
   }

@@ -12,14 +12,17 @@
 
   import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import { map} from "./stores";
-
+  import { eventsInHighlight, map, lookingGlassBool } from "./stores";
+  import { sampleSize, geocoderApi } from "$lib/utils.js";
+  import { fly } from "svelte/transition";
   /**
    * The search query.
    * @type {string}
    */
-  export let searchQuery;
+  let searchQuery;
+  let pastQuery = "";
 
+  let geocodedResults;
 
   /**
    * Searches for events in the map.
@@ -28,91 +31,159 @@
    * The matching events are then added to a new layer called "hwdb-highlight"
    * and styled as red circles.
    */
-  export function searchLayer(searchQuery) {
+
+  export async function searchOSM(searchQuery) {
+    geocodedResults = await geocoderApi.forwardGeocode(searchQuery);
+    console.log(geocodedResults);
+  }
+
+  export async function searchLayer(searchQuery) {
     /**
      * The features that match the search query.
      * @type {Array<maplibre.Feature>}
      */
+    // switch off looking glass
+    $lookingGlassBool = false;
 
-     try {
-      searchQuery = searchQuery[1]
-    let toBehighlighted = [],
-      features;
-    // query the layer for the existence of a keyword in teh title
-    // get random points from nearby
-    let getNearbyFeatures = $map.queryRenderedFeatures({
-      layers: ["point"], 
-    });
+    try {
+      let toBehighlighted = [],
+        features;
+      // query the layer for the existence of a keyword in teh title
+      // get random points from nearby
+      let getNearbyFeatures = $map.queryRenderedFeatures({
+        layers: ["point"],
+      });
 
-    // loop through the properties
-    // if the property exists, add it to the highlight layer
-getNearbyFeatures.forEach((element) => {
-  try {
-    if (
-        element.properties.excerpt
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase())
-      ) {
-        toBehighlighted.push(element);
+      // loop through the properties
+      // if the property exists, add it to the highlight layer
+      getNearbyFeatures.forEach((element) => {
+        try {
+          if (
+            element.properties.excerpt
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          ) {
+            toBehighlighted.push(element);
+          }
+        } catch (e) {
+          console.error(`Failed to forwardGeocode with error: ${e}`);
+        }
+      });
+      $eventsInHighlight = {
+        features: toBehighlighted,
+        type: "FeatureCollection",
+      };
+      $eventsInHighlight = $eventsInHighlight;
+
+      // create a duplicate source for the highlight
+      if ($map.getSource("hwdb-highlight")) {
+        features = $map
+          .getSource("hwdb-highlight")
+          .setData({ type: "FeatureCollection", features: toBehighlighted })[
+          "_data"
+        ]["features"];
+      } else {
+        $map.addSource("hwdb-highlight", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: "",
+          },
+        });
+        $map.addLayer({
+          id: "hwdb-highlight",
+          type: "circle",
+          source: "hwdb-highlight",
+          paint: {
+            "circle-radius": 10,
+            "circle-color": "red",
+            "circle-opacity": 0.5,
+          },
+        });
+        features = $map
+          .getSource("hwdb-highlight")
+          .setData({ type: "FeatureCollection", features: toBehighlighted })[
+          "_data"
+        ]["features"];
       }
-  } catch (e) {
-    console.error(`Failed to forwardGeocode with error: ${e}`);
-  }
-     
-    })
 
-
-    // create a duplicate source for the highlight
-    if ($map.getSource("hwdb-highlight")) {
-      features = $map
-        .getSource("hwdb-highlight")
-        .setData({ type: "FeatureCollection", features: toBehighlighted })[
-        "_data"
-      ]["features"];
-    } else {
-      $map.addSource("hwdb-highlight", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: "",
-        },
-      });
-      $map.addLayer({
-        id: "hwdb-highlight",
-        type: "circle",
-        source: "hwdb-highlight",
-        paint: {
-          "circle-radius": 10,
-          "circle-color": "red",
-          "circle-opacity": 0.5,
-        },
-      });
-      features = $map
-        .getSource("hwdb-highlight")
-        .setData({ type: "FeatureCollection", features: toBehighlighted })[
-        "_data"
-      ]["features"];
-    }
-     } catch (e) {
+      // for every feature in toBehighlighted, create a MarkerPopup
+      // and add it to the map
+      // let randomCollection = sampleSize(toBehighlighted, 5);
+      // randomCollection.forEach((feature) => {
+      //   let popup = new maplibre.Popup()
+      //     .setLngLat(feature.geometry.coordinates)
+      //     .setHTML("")
+      //     .addTo($map);
+      //   let child = popup.getElement();
+      //   new MarkerPopup({
+      //     target: child.children[1],
+      //     props: {
+      //       title: feature.properties.title,
+      //       excerpt: feature.properties.excerpt,
+      //       date: feature.properties.date,
+      //       link: feature.properties.link,
+      //       locations: feature.properties.natural_locations_openai,
+      //       map: $map,
+      //       coordinates: feature.geometry.coordinates,
+      //     },
+      //   });
+      // });
+    } catch (e) {
       console.error(`Failed to forwardGeocode with error: ${e}`);
     }
-    
   }
-  searchLayer(searchQuery)
+
+  $: if (searchQuery?.length > 3 && searchQuery !== pastQuery) {
+    searchOSM(searchQuery);
+    pastQuery = searchQuery;
+  } else if (searchQuery?.length < 3 && pastQuery) {
+    geocodedResults = null;
+  }
 </script>
 
-<!-- <div class="w-full flex">
-  <input
-    type="text"
-    id="search-input"
-    bind:value={searchQuery}
-    class=" !text-black px-1 w-40 py-0 bg-gray-300"
-    placeholder="Search for an event"
-  />
-  <button
-    on:click={() => searchLayer()}
-    class=" !text-black px-1 py-0 m-1 bg-gray-300"
-    id="search-button">Search</button
+<div class="w-[70%]">
+  <div class="grid">
+    <input
+      type="text"
+      id="search-input"
+      bind:value={searchQuery}
+      class=" !text-black py-2 px-1 bg-gray-300"
+      placeholder="Search for an event"
+    />
+  </div>
+  <button class="w-full my-1" on:click={() => searchLayer(searchQuery)}>
+    Search across events</button
   >
-</div> -->
 
+  <div class="bg-neutral-100 px-2 py-1 mb-2">
+    <p class="text-xs">
+      Found {$eventsInHighlight?.features?.length || 0} events. You can explore them
+      on the right. Looking glass mode is switched {$lookingGlassBool
+        ? "on"
+        : "off"} because you {$lookingGlassBool ? "are not" : "are"} searching.
+    </p>
+    <button
+      class="w-full text-xs bg-neutral"
+      on:click={() => {
+        if ($lookingGlassBool) {
+          $lookingGlassBool = false;
+        } else {
+          $lookingGlassBool = true;
+          searchQuery = "";
+        }
+      }}>Switch {$lookingGlassBool ? "off" : "on"} looking glass</button
+    >
+  </div>
+  {#if geocodedResults?.features.length > 0}
+    <div class="bg-neutral-100 px-2 py-1 h-40 overflow-y-scroll">
+      <p class="mb-0!important text-xs">Go to locations</p>
+      {#each geocodedResults.features as result}
+        <button
+          class="text-xs bg-neutral-300 mb-1"
+          on:click={() => $map.flyTo(result.center)}>{result.place_name}</button
+        >
+      {/each}
+    </div>
+  {/if}
+</div>
