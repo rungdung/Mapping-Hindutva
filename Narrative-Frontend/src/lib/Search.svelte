@@ -15,6 +15,9 @@
   import { eventsInHighlight, map, lookingGlassBool } from "./stores";
   import { sampleSize, geocoderApi } from "$lib/utils.js";
   import { fly } from "svelte/transition";
+
+  import { Button, Toggle } from "carbon-components-svelte";
+  import Search from "carbon-icons-svelte/lib/Search.svelte";
   /**
    * The search query.
    * @type {string}
@@ -152,35 +155,37 @@
       placeholder="Search for an event"
     />
   </div>
-  <button class="w-full my-1" on:click={() => searchLayer(searchQuery)}>
-    Search across events</button
+  <Button
+    class="w-full my-4"
+    kind="secondary"
+    on:click={() => searchLayer(searchQuery)}
+    icon={Search}
+  >
+    Search across events</Button
   >
 
-  <div class="bg-neutral-100 px-2 py-1 mb-2">
+  <div class="bg-neutral-200 px-2 py-1 mb-2">
     <p class="text-xs">
       Found {$eventsInHighlight?.features?.length || 0} events. You can explore them
-      on the right. Looking glass mode is switched {$lookingGlassBool
-        ? "on"
-        : "off"} because you {$lookingGlassBool ? "are not" : "are"} searching.
+      on the right.
     </p>
-    <button
-      class="w-full text-xs bg-neutral"
-      on:click={() => {
-        if ($lookingGlassBool) {
-          $lookingGlassBool = false;
-        } else {
-          $lookingGlassBool = true;
-          searchQuery = "";
-        }
-      }}>Switch {$lookingGlassBool ? "off" : "on"} looking glass</button
-    >
+    <div class="flex gap-2">
+      <p class="text-xs">
+        Looking glass mode is switched {$lookingGlassBool ? "on" : "off"} because
+        you
+        {$lookingGlassBool ? "are not" : "are"} searching.
+      </p>
+
+      <Toggle bind:toggled={$lookingGlassBool} size="sm" />
+      {$lookingGlassBool}
+    </div>
   </div>
   {#if geocodedResults?.features.length > 0}
-    <div class="bg-neutral-100 px-2 py-1 h-40 overflow-y-scroll">
-      <p class="mb-0!important text-xs">Go to locations</p>
+    <div class="bg-neutral-200 px-2 py-1 h-40 overflow-y-scroll">
+      <p class="mb-0 text-xs">Go to locations</p>
       {#each geocodedResults.features as result}
         <button
-          class="text-xs bg-neutral-300 mb-1"
+          class="text-xs bg-neutral-500 mb-1"
           on:click={() => $map.flyTo(result.center)}>{result.place_name}</button
         >
       {/each}

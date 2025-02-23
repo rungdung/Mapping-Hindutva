@@ -94,11 +94,6 @@
       <div>
         Events under the looking glass within a radius of {$searchRange}km
       </div>
-      <br />
-
-      <p class="text-xs underline mb-1">
-        Right click to freeze and study the area in focus
-      </p>
 
       <br />
       <RowsPerPage {table} />

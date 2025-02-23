@@ -49,36 +49,41 @@
       [75.99829734320153, 24.75704540804498],
     ];
 
-    $map.addSource("buffer", {
-      type: "canvas",
-      canvas: canvas,
-      coordinates: bufferCoordinates,
-    });
+    if ($map.getSource("buffer")) {
+    } else {
+      $map.addSource("buffer", {
+        type: "canvas",
+        canvas: canvas,
+        coordinates: bufferCoordinates,
+      });
+      $map.addLayer({
+        id: "buffer",
+        type: "raster",
+        source: "buffer",
+      });
+    }
 
-    $map.addLayer({
-      id: "buffer",
-      type: "raster",
-      source: "buffer",
-    });
+    if ($map.getSource("highlights")) {
+    } else {
+      $map.addSource("highlights", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      });
 
-    $map.addSource("highlights", {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      },
-    });
-
-    $map.addLayer({
-      id: "highlights",
-      type: "circle",
-      source: "highlights",
-      paint: {
-        "circle-color": "red",
-        "circle-opacity": 0.5,
-        "circle-radius": 5,
-      },
-    });
+      $map.addLayer({
+        id: "highlights",
+        type: "circle",
+        source: "highlights",
+        paint: {
+          "circle-color": "red",
+          "circle-opacity": 0.5,
+          "circle-radius": 5,
+        },
+      });
+    }
   };
 
   // Separate function for handling mouse move logic
@@ -113,16 +118,13 @@
     if (mouseMoveUnsubscribe) {
       mouseMoveUnsubscribe();
     }
-
     // Add new listener
     $map.on("mousemove", debouncedMouseMove);
     mouseMoveUnsubscribe = () => $map.off("mousemove", debouncedMouseMove);
   }
 
   onMount(() => {
-    if ($lookingGlassBool) {
-      drawCircle();
-    }
+    drawCircle();
   });
 
   onDestroy(() => {
