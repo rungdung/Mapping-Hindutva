@@ -20,7 +20,7 @@
   });
 </script>
 
-<div id="" class="absolute left-2 top-2 z-20 !text-gray-600 w-[30vw] p-10">
+<div id="" class="absolute left-2 top-2 z-20 !text-gray-600 w-[20vw] p-10">
   <LeftBar />
   <Search />
 </div>

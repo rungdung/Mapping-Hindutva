@@ -16,7 +16,7 @@
   import { sampleSize, geocoderApi } from "$lib/utils.js";
   import { fly } from "svelte/transition";
 
-  import { Button, Toggle } from "carbon-components-svelte";
+  import { Button, Toggle, TextInput } from "carbon-components-svelte";
   import Search from "carbon-icons-svelte/lib/Search.svelte";
   /**
    * The search query.
@@ -109,29 +109,6 @@
           "_data"
         ]["features"];
       }
-
-      // for every feature in toBehighlighted, create a MarkerPopup
-      // and add it to the map
-      // let randomCollection = sampleSize(toBehighlighted, 5);
-      // randomCollection.forEach((feature) => {
-      //   let popup = new maplibre.Popup()
-      //     .setLngLat(feature.geometry.coordinates)
-      //     .setHTML("")
-      //     .addTo($map);
-      //   let child = popup.getElement();
-      //   new MarkerPopup({
-      //     target: child.children[1],
-      //     props: {
-      //       title: feature.properties.title,
-      //       excerpt: feature.properties.excerpt,
-      //       date: feature.properties.date,
-      //       link: feature.properties.link,
-      //       locations: feature.properties.natural_locations_openai,
-      //       map: $map,
-      //       coordinates: feature.geometry.coordinates,
-      //     },
-      //   });
-      // });
     } catch (e) {
       console.error(`Failed to forwardGeocode with error: ${e}`);
     }
@@ -145,14 +122,15 @@
   }
 </script>
 
-<div class="w-[70%]">
+<div class="">
   <div class="grid">
-    <input
+    <TextInput
       type="text"
       id="search-input"
       bind:value={searchQuery}
-      class=" !text-black py-2 px-1 bg-gray-300"
-      placeholder="Search for an event"
+      class=" py-2 px-1 bg-gray-300"
+      placeholder="Search for an event or place"
+      light
     />
   </div>
   <Button
@@ -164,20 +142,17 @@
     Search across events</Button
   >
 
-  <div class="bg-neutral-200 px-2 py-1 mb-2">
-    <p class="text-xs">
-      Found {$eventsInHighlight?.features?.length || 0} events. You can explore them
-      on the right.
-    </p>
-    <div class="flex gap-2">
-      <p class="text-xs">
-        Looking glass mode is switched {$lookingGlassBool ? "on" : "off"} because
-        you
-        {$lookingGlassBool ? "are not" : "are"} searching.
-      </p>
+  <div class="mt-4">
+    <div class="text-xs bg-neutral-200 px-2 py-1">
+      Found <span class="font-bold px-1 bg-orange-200"
+        >{$eventsInHighlight?.features?.length || 0} events</span
+      >. You can explore them on the right.
+    </div>
+    <div class="flex gap-2 my-2 bg-neutral-200 px-2 py-1 text-xs">
+      Looking glass mode is switched {$lookingGlassBool ? "on" : "off"} because you
+      {$lookingGlassBool ? "are not" : "are"} searching.
 
       <Toggle bind:toggled={$lookingGlassBool} size="sm" />
-      {$lookingGlassBool}
     </div>
   </div>
   {#if geocodedResults?.features.length > 0}

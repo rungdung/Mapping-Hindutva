@@ -19,7 +19,7 @@
 
 {#if mounted}
   <div
-    class="mx-auto h-[40vh]"
+    class="mx-auto h-[40vh] w-3/4 my-40"
     in:fade={{ duration: 400 }}
     out:fade={{ duration: 300 }}
   >
