@@ -6,7 +6,6 @@
    */
   import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import MaplibreGeocoder from "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.mjs";
   import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
   import { onMount, onDestroy } from "svelte";
   import ResourceLayer from "./ResourceLayer.svelte";
@@ -35,12 +34,19 @@
       transformRequest: (url) => ({ url, cache: "force-cache" }),
     });
 
+    $map.dragRotate.disable();
+    $map.keyboard.disable();
+
     $map.addControl(new maplibre.NavigationControl());
 
     // Handle map load event
     $map.on("load", () => {
       // Load ResourceLayer
       mapLoaded = true;
+    });
+
+    $map.on("click", (event) => {
+      $lookingGlassBool = false;
     });
   });
 
