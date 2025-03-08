@@ -63,9 +63,9 @@
       });
     }
 
-    if ($map.getSource("highlights")) {
+    if ($map.getSource("hwdb-highlight")) {
     } else {
-      $map.addSource("highlights", {
+      $map.addSource("hwdb-highlight", {
         type: "geojson",
         data: {
           type: "FeatureCollection",
@@ -74,9 +74,9 @@
       });
 
       $map.addLayer({
-        id: "highlights",
+        id: "hwdb-highlight",
         type: "circle",
-        source: "highlights",
+        source: "hwdb-highlight",
         paint: {
           "circle-color": "red",
           "circle-opacity": 0.5,
@@ -103,7 +103,7 @@
     $map.getSource("buffer")?.setCoordinates(bboxBuffer);
 
     $eventsInHighlight = pointsWithinPolygon($resourceBlob, bufferPolygon);
-    $map.getSource("highlights")?.setData({
+    $map.getSource("hwdb-highlight")?.setData({
       type: "FeatureCollection",
       features: $eventsInHighlight.features,
     });
