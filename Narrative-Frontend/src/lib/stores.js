@@ -13,6 +13,7 @@ export const loadStatus = writable({
   mapLoaded: false,
   dataLoaded: false,
 });
+export const title = writable("Where does Hate live?");
 export const parentSearchSuggestions = [
   "RSS",
   "BJP",

@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import About from "$lib/Body.svx";
+  import { title } from "$lib/stores";
 
   let mounted = false;
 
@@ -19,27 +20,26 @@
 
 {#if mounted}
   <div
-    class="mx-auto h-[40vh] w-3/4 my-40"
+    class="mx-auto px-2 h-[40vh] md:w-1/2 my-40"
     in:fade={{ duration: 400 }}
     out:fade={{ duration: 300 }}
   >
     <h1
-      class="title max-w-[50vw]"
+      class="title"
       in:fade={{ duration: 500, delay: 100 }}
       out:fade={{ duration: 300 }}
     >
-      What are the relationships between Law Making, Hindutva and Media
-      coverage: an effort to make them apparent, but by no definition a thesis.
+      {$title}
     </h1>
 
     <br />
 
     <div
-      class=" gap-4 mt-20 justify-center h-full"
+      class=" gap-4 h-full"
       in:fade={{ duration: 500, delay: 200 }}
       out:fade={{ duration: 300 }}
     >
-      <About></About>
+      <About />
       <button
         on:click={() => handleNav("/map?view=map")}
         class="bg-neutral-700 text-xs px-4 py-2 rounded hover:bg-neutral-600 transition-colors"
@@ -52,6 +52,6 @@
 
 <style>
   .title {
-    @apply text-2xl font-bold mb-6 text-center;
+    @apply text-2xl font-bold mb-6;
   }
 </style>

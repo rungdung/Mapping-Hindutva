@@ -1,30 +1,27 @@
 <script>
   import Search from "$lib/Search.svelte";
-  import Timeline from "$lib/Timeline.svelte";
-  import RightBar from "$lib/RightBar.svelte";
+  import { title } from "$lib/stores";
 </script>
 
 <div class="">
   <div class=" ">
-    <div class="mb-2">
-      <h1 class="title text-xl">
-        Spatial archive of Hindutva and related ethno violence
-      </h1>
+    <div class="mb-2 bg-neutral-600 text-white space-y-2 p-2">
+      <h1 class="title text-xl">{$title}</h1>
+      <div class="text-xs/1!important">
+        What goes on in your village, in your city, and the next street next to
+        yours?
+      </div>
       <nav
         class="text-xs list-none flex gap-2 mt-3 underline !text-neutral-600"
       >
         <li>
-          <a href="/">Home</a>
+          <a href="/">About</a>
         </li>
       </nav>
-
-      <!-- <h3 class=" text-xs">
-      This is a prototype to explore linked stories of Hindutva, communal
-      violence and related incidents. <br /> <br />
-    </h3> -->
     </div>
   </div>
 </div>
+<Search />
 
 <style lang="postcss">
   #meta-info li a {
