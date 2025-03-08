@@ -12,21 +12,36 @@
 
   import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import { eventsInHighlight, map, lookingGlassBool } from "./stores";
+  import {
+    eventsInHighlight,
+    map,
+    lookingGlassBool,
+    parentSearchSuggestions,
+    searchQuery,
+  } from "./stores";
   import { sampleSize, geocoderApi } from "$lib/utils.js";
   import { fly } from "svelte/transition";
 
   import { Button, Toggle, TextInput } from "carbon-components-svelte";
+  import CircleDash from "carbon-icons-svelte/lib/CircleDash.svelte";
+  import Cursor_1 from "carbon-icons-svelte/lib/Cursor_1.svelte";
   import Search from "carbon-icons-svelte/lib/Search.svelte";
+  import CloseLarge from "carbon-icons-svelte/lib/CloseLarge.svelte";
+
   /**
    * The search query.
    * @type {string}
    */
-  let searchQuery;
   let pastQuery = "";
 
   let geocodedResults;
 
+  // randomly select
+  let searchSuggestions = sampleSize(parentSearchSuggestions, 8);
+  let displaySearchResultsBoolean = false;
+
+  // create timeout for search results
+  let searchTimeout;
   /**
    * Searches for events in the map.
    * It takes the search query and looks for events that have the search query
@@ -35,12 +50,12 @@
    * and styled as red circles.
    */
 
-  export async function searchOSM(searchQuery) {
-    geocodedResults = await geocoderApi.forwardGeocode(searchQuery);
+  export async function searchOSM($searchQuery) {
+    geocodedResults = await geocoderApi.forwardGeocode($searchQuery);
     console.log(geocodedResults);
   }
 
-  export async function searchLayer(searchQuery) {
+  export async function searchLayer($searchQuery) {
     /**
      * The features that match the search query.
      * @type {Array<maplibre.Feature>}
@@ -62,9 +77,9 @@
       getNearbyFeatures.forEach((element) => {
         try {
           if (
-            element.properties.excerpt
+            element.properties?.excerpt
               .toLowerCase()
-              .includes(searchQuery.toLowerCase())
+              .includes($searchQuery.toLowerCase())
           ) {
             toBehighlighted.push(element);
           }
@@ -72,6 +87,7 @@
           console.error(`Failed to forwardGeocode with error: ${e}`);
         }
       });
+
       $eventsInHighlight = {
         features: toBehighlighted,
         type: "FeatureCollection",
@@ -99,7 +115,7 @@
           source: "hwdb-highlight",
           paint: {
             "circle-radius": 10,
-            "circle-color": "red",
+            "circle-color": "#fed7aa",
             "circle-opacity": 0.5,
           },
         });
@@ -114,48 +130,94 @@
     }
   }
 
-  $: if (searchQuery?.length > 3 && searchQuery !== pastQuery) {
-    searchOSM(searchQuery);
-    pastQuery = searchQuery;
-  } else if (searchQuery?.length < 3 && pastQuery) {
-    geocodedResults = null;
+  $: {
+    if ($searchQuery?.length > 3 && $searchQuery !== pastQuery) {
+      displaySearchResultsBoolean = true;
+      searchOSM($searchQuery);
+      pastQuery = $searchQuery;
+      searchTimeout = setTimeout(
+        () => (displaySearchResultsBoolean = false),
+        2000
+      );
+    } else if ($searchQuery?.length < 3 && pastQuery) {
+      geocodedResults = null;
+    }
   }
 </script>
 
 <div class="">
-  <div class="grid">
-    <TextInput
-      type="text"
-      id="search-input"
-      bind:value={searchQuery}
-      class=" py-2 px-1 bg-gray-300"
-      placeholder="Search for an event or place"
-      light
-    />
-  </div>
-  <Button
-    class="w-full my-4"
-    kind="secondary"
-    on:click={() => searchLayer(searchQuery)}
-    icon={Search}
-  >
-    Search across events</Button
-  >
-
-  <div class="mt-4">
-    <div class="text-xs bg-neutral-200 px-2 py-1">
-      Found <span class="font-bold px-1 bg-orange-200"
-        >{$eventsInHighlight?.features?.length || 0} events</span
-      >. You can explore them on the right.
+  <div class="bg-neutral-200">
+    <div class="flex">
+      <input
+        type="text"
+        id="search-input"
+        bind:value={$searchQuery}
+        class="bg-neutral-400 flex-auto text-white py-2 px-1 bg-gray-300"
+        placeholder="Search for an event or place"
+        on:keydown={(e) => {
+          if (e.key === "Enter") {
+            searchLayer($searchQuery);
+          }
+        }}
+      />
+      <Button
+        class="w-14 flex-none my-4"
+        kind="secondary"
+        on:click={() => searchLayer($searchQuery)}
+        icon={Search}
+      ></Button>
+      <Button
+        class="w-14 flex-none my-4"
+        kind="secondary"
+        on:click={() => ($searchQuery = "")}
+        icon={CloseLarge}
+      ></Button>
     </div>
-    <div class="flex gap-2 my-2 bg-neutral-200 px-2 py-1 text-xs">
-      Looking glass mode is switched {$lookingGlassBool ? "on" : "off"} because you
-      {$lookingGlassBool ? "are not" : "are"} searching.
-
-      <Toggle bind:toggled={$lookingGlassBool} size="sm" />
+    <div class="gap-1 p-1 bg-neutral-600 inline-flex flex-wrap">
+      <div class="text-xs bold text-white">Search Suggestions:</div>
+      {#each searchSuggestions as suggestion}
+        <span
+          class="text-xs/5 bg-orange-200 px-1 rounded-sm hover:cursor-pointer"
+          on:click={() => {
+            $searchQuery = suggestion;
+            searchLayer(suggestion);
+          }}>{suggestion}</span
+        >
+      {/each}
     </div>
   </div>
-  {#if geocodedResults?.features.length > 0}
+
+  <div class="mt-2 flex gap-2">
+    <div class="text-xs bg-neutral-600 p-2 text-white">
+      Found <br />
+      <div
+        class="font-bold text-xl bg-orange-200 w-full flex items-center justify-center"
+      >
+        <span class=" text-neutral-600"
+          >{$eventsInHighlight?.features?.length || 0}</span
+        >
+      </div>
+      events
+    </div>
+    <div class="gap-2 bg-neutral-600 text-white p-2 text-xs flex-grow">
+      <div class="flex gap-2">
+        Area search
+        <div class=" mx-auto">
+          {#if $lookingGlassBool}
+            <CircleDash size={24} />
+          {:else}
+            <Cursor_1 size={24} />
+          {/if}
+        </div>
+      </div>
+      <div class="flex w-full items-center justify-center">
+        <Toggle bind:toggled={$lookingGlassBool} size="sm" />
+      </div>
+    </div>
+  </div>
+  <!--- show results only if focus is on search input-->
+
+  {#if geocodedResults?.features.length > 0 && displaySearchResultsBoolean}
     <div class="bg-neutral-200 px-2 py-1 h-40 overflow-y-scroll">
       <p class="mb-0 text-xs">Go to locations</p>
       {#each geocodedResults.features as result}

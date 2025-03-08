@@ -78,7 +78,7 @@
         type: "circle",
         source: "hwdb-highlight",
         paint: {
-          "circle-color": "red",
+          "circle-color": "#fed7aa",
           "circle-opacity": 0.5,
           "circle-radius": 5,
         },
@@ -110,7 +110,7 @@
   };
 
   // Use the debounced version of handleMouseMove
-  const debouncedMouseMove = debounce(handleMouseMove, 5);
+  const debouncedMouseMove = debounce(handleMouseMove, 50);
 
   // Reactive statement to set up mouse move listener
   $: if ($loadStatus.dataLoaded && $map) {

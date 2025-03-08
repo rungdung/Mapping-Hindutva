@@ -2,12 +2,17 @@
   import MapContainer from "$lib/MapContainer.svelte";
   import RightBar from "$lib/RightBar.svelte";
   import LeftBar from "$lib/LeftBar.svelte";
-  import { lookingGlassBool } from "../../lib/stores";
+  import {
+    lookingGlassBool,
+    eventsInHighlight,
+    singleEventInHighlight,
+  } from "../../lib/stores";
   import { onMount } from "svelte";
-  import { Button, Modal } from "carbon-components-svelte";
-  import Search from "../../lib/Search.svelte";
-  let height;
-  let modalOpen = true;
+  import { Button, Modal, ToastNotification } from "carbon-components-svelte";
+  import { Drawer } from "vaul-svelte";
+
+  let openDrawer = false;
+  let width;
 
   onMount(() => {
     let params = new URLSearchParams(window.location.search);
@@ -18,34 +23,58 @@
       $lookingGlassBool = false;
     }
   });
+
+  $: openDrawer =
+    $eventsInHighlight?.features?.length > 0 && !$singleEventInHighlight
+      ? true
+      : false;
 </script>
 
-<div id="" class="absolute left-2 top-2 z-20 !text-gray-600 w-[20vw] p-10">
-  <LeftBar />
-  <Search />
-</div>
-<div class="grid grid-cols-[3fr_2fr] z-10 w-screen">
-  <MapContainer />
-  <RightBar />
-</div>
-
-<Modal
-  bind:open={modalOpen}
-  modalHeading="Disclaimer"
-  primaryButtonText="Continue"
-  on:click:button--primary={() => (modalOpen = false)}
-  on:open
-  on:close
-  on:submit
+<svelte:window bind:innerWidth={width} />
+<div
+  id=""
+  class="absolute md:left-2 md:top-2 z-20 !text-gray-600 md:w-[20vw] md:p-10"
 >
-  <p>
-    This project is not for public distribution yet, it is a prototype to
+  <LeftBar />
+</div>
+<div
+  class="grid h-screen {width < 768
+    ? 'grid-cols-1 grid-rows-2'
+    : 'grid-cols-[3fr_2fr]'}  z-10 w-screen max-h-screen"
+>
+  <MapContainer />
+  {#if width > 768}
+    <RightBar />
+  {/if}
+</div>
+{#if width < 768}
+  <Drawer.Root direction="bottom" bind:open={openDrawer}>
+    <Drawer.Trigger class="fixed bottom-0 right-0 left-0 z-30"
+      >Open</Drawer.Trigger
+    >
+    <Drawer.Overlay class="fixed inset-0 bg-black/40" />
+    <Drawer.Portal>
+      <Drawer.Content
+        class="fixed flex flex-col bg-neutral-800 border border-gray-200 border-b-none rounded-t-[10px] bottom-0 left-0 md:left-auto md:top-0 right-0 h-full h-[60%] mx-[-1px]z-40"
+      >
+        <RightBar />
+      </Drawer.Content>
+    </Drawer.Portal>
+  </Drawer.Root>
+{/if}
+
+<div
+  class="absolute left-2 bottom-2 z-20 !text-gray-600 p-10 text-xs!important"
+>
+  <ToastNotification
+    title="Disclaimer:"
+    subtitle="This project is not for public distribution yet, it is a prototype to
     explore linked stories of Hindutva, communal violence and related incidents.
     Use your cursor to navigate the map, events within the looking-glass around
     your cursor will be highlighted on the left. To read more about the events
-    being highlighted, right-click and pause the looking glass.
-  </p>
-</Modal>
+    being highlighted, right-click and pause the looking glass."
+  />
+</div>
 
 <style lang="postcss">
   :global(.bx--btn--primary) {

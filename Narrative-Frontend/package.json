@@ -28,11 +28,16 @@
     "@turf/collect": "^6.5.0",
     "@turf/turf": "^6.5.0",
     "carbon-components-svelte": "^0.86.0",
+    "carbon-icons-svelte": "^13.2.0",
+    "d3": "^7.9.0",
+    "d3-cloud": "^1.2.7",
     "d3-milestones": "^1.4.7",
     "litegraph": "^0.0.0",
     "litegraph.js": "^0.7.12",
     "maplibre-gl": "^4.0.0",
     "svelte-collapsible": "^0.2.1",
+    "vaul-svelte": "^0.3.2",
     "vite": "^5.4.8"
-  }
+  },
+  "packageManager": "yarn@4.6.0+sha512.5383cc12567a95f1d668fbe762dfe0075c595b4bfff433be478dbbe24e05251a8e8c3eb992a986667c1d53b6c3a9c85b8398c35a960587fbd9fa3a0915406728"
 }
