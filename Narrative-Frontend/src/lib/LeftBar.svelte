@@ -1,6 +1,8 @@
 <script>
   import Search from "$lib/Search.svelte";
   import { title } from "$lib/stores";
+  import Legend from "./Legend.svelte";
+  import { ExpandableTile } from "carbon-components-svelte";
 </script>
 
 <div class="">
@@ -21,7 +23,16 @@
     </div>
   </div>
 </div>
-<Search />
+
+<div>Legend</div>
+<div>
+  <Legend />
+</div>
+
+<div>Search</div>
+<div>
+  <Search />
+</div>
 
 <style lang="postcss">
   #meta-info li a {

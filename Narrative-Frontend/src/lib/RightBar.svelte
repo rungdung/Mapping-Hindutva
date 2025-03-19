@@ -11,13 +11,9 @@
   import { LocationFilled, Link } from "carbon-icons-svelte";
   import Timeline from "./Timeline.svelte";
 
-  let involvedGroups = $state([]);
+  import { getDomainFromUrl } from "$lib/utils.js";
 
-  $effect(() => {
-    if ($eventsInHighlight?.features?.length > 0) {
-      involvedGroups = [];
-    }
-  });
+  let involvedGroups = $state([]);
 
   // Handle click on top of map
   let handleClick = (event) => {
@@ -103,7 +99,7 @@
     <br />
   {/snippet}
   <div class="row-span-7 overflow-y-scroll">
-    {#each $eventsInHighlight?.features as row}
+    {#each $eventsInHighlight as row}
       <div
         class="card space-y-2 overflow-y-scroll hover:bg-orange-200 hover:text-black {$singleEventInHighlight
           ?.properties?.title == row?.properties?.title
@@ -114,27 +110,45 @@
       >
         <div>
           {@html row?.properties?.title}
-          <span class=" text-xs">
-            Category:
-            <span class="px-1 bg-orange-300 text-black"
-              >{row?.properties?.category_slug
-                ? row?.properties?.category_slug
-                : "Uncategorised"}</span
-            ></span
-          ><br />
-          <span class=" text-xs">
-            Location:
-            <span class="px-1 bg-orange-300 text-black"
-              >{row?.properties?.natural_locations_openai}</span
-            ></span
-          >
-          <span class=" text-xs">
-            Article Dated
-            <span class="px-1 bg-orange-300 text-black"
-              >{row?.properties?.date.slice(0, 10)}</span
-            ></span
-          >
-          <div class="w-full">
+          <br />
+          <div class="grid grid-cols-5 mt-2">
+            <div class="col-span-2">
+              <span class=" text-xs">
+                Category:
+                <span class="px-1 bg-orange-300 text-black"
+                  >{row?.properties?.category_slug
+                    ? row?.properties?.category_slug
+                    : "Uncategorised"}</span
+                ></span
+              ><br />
+              <span class="text-xs">
+                Source:
+                <a
+                  href={row?.properties?.link}
+                  target="
+              _blank"
+                >
+                  <span class="px-1 bg-red-300 text-black"
+                    >{getDomainFromUrl(row?.properties?.link)}
+                    <Link class="inline" size="10" /></span
+                  >
+                </a>
+              </span>
+
+              <br />
+              <span class=" text-xs">
+                Location:
+                <span class="px-1 bg-orange-300 text-black"
+                  >{row?.properties?.natural_locations_openai}</span
+                ></span
+              ><br />
+              <span class=" text-xs">
+                Article Dated
+                <span class="px-1 bg-orange-300 text-black"
+                  >{row?.properties?.date.slice(0, 10)}</span
+                ></span
+              >
+              <!-- <div class="w-full">
             <Button
               iconDescription="Locate"
               icon={LocationFilled}
@@ -142,22 +156,19 @@
               kind="tertiary"
               size="small"
             ></Button>
-            <Button
-              iconDescription="Read Article"
-              icon={Link}
-              onclick={() => window.open(row?.properties?.link)}
-              size="small"
-              kind="tertiary"
-            ></Button>
-          </div>
-        </div>
-        <div class="excerpt space-y-2">
-          {@html row?.properties?.excerpt.replace("<p>", "")}
-          <div class="line-height-10">
-            {#each eval(row?.properties?.involved) as group}
-              <span class="px-1 text-xs bg-orange-200 text-black">{group}</span
-              >,
-            {/each}
+          </div> -->
+            </div>
+
+            <div class="excerpt space-y-2 col-span-3">
+              {@html row?.properties?.excerpt?.replace("<p>", "")}
+              <div class="line-height-10">
+                {#each eval(row?.properties?.involved) as group}
+                  <span class="px-1 text-xs bg-orange-200 text-black"
+                    >{group}</span
+                  >,
+                {/each}
+              </div>
+            </div>
           </div>
         </div>
       </div>

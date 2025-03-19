@@ -44,7 +44,19 @@
         on:click={() => handleNav("/map?view=map")}
         class="bg-neutral-700 text-xs px-4 py-2 rounded hover:bg-neutral-600 transition-colors"
       >
-        Map View
+        Where does Hate live? And where does misinformation affect?
+      </button>
+      <button
+        on:click={() => handleNav("/map?view=map")}
+        class="bg-neutral-700 text-xs px-4 py-2 rounded hover:bg-neutral-600 transition-colors"
+      >
+        What kinds of hate and misinformation exist?
+      </button>
+      <button
+        on:click={() => handleNav("/map?view=map")}
+        class="bg-neutral-700 text-xs px-4 py-2 rounded hover:bg-neutral-600 transition-colors"
+      >
+        When do they occur?
       </button>
     </div>
   </div>

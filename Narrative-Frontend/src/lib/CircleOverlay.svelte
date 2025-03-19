@@ -91,7 +91,6 @@
     const mousePosition = [e.lngLat.lng, e.lngLat.lat];
     const bufferPolygon = buffer(point(mousePosition), $searchRange);
 
-    // Use optional chaining and nullish coalescing for safety
     const bboxBuffer =
       bboxPolygon(bbox(bufferPolygon.geometry))?.geometry?.coordinates?.[0] ??
       [];
@@ -99,13 +98,22 @@
     // Remove last coordinate to close polygon
     bboxBuffer.pop();
 
-    // Safely update sources
     $map.getSource("buffer")?.setCoordinates(bboxBuffer);
+    $eventsInHighlight = [];
 
-    $eventsInHighlight = pointsWithinPolygon($resourceBlob, bufferPolygon);
+    let layersToSearch = $resourceBlob
+      .filter((layer) => layer.visibility === true)
+      .map((layer) => layer);
+
+    layersToSearch.forEach((layer) => {
+      $eventsInHighlight.push(
+        ...pointsWithinPolygon(layer.blob, bufferPolygon).features
+      );
+    });
+
     $map.getSource("hwdb-highlight")?.setData({
       type: "FeatureCollection",
-      features: $eventsInHighlight.features,
+      features: $eventsInHighlight,
     });
   };
 

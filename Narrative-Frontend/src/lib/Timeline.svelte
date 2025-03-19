@@ -4,7 +4,7 @@
   let timelineRef;
 
   $effect(() => {
-    if ($eventsInHighlight?.features?.length > 0) {
+    if ($eventsInHighlight?.length > 0) {
       updateTimeline();
       // debouncedUpdate();
     }
@@ -15,9 +15,9 @@
 
     d3.select(timelineRef).selectAll("*").remove();
 
-    if (!$eventsInHighlight || !$eventsInHighlight.features) return;
+    if (!$eventsInHighlight) return;
 
-    const events = $eventsInHighlight.features.map((item) => ({
+    const events = $eventsInHighlight.map((item) => ({
       date: new Date(item.properties.date),
       title: item.properties.title,
       excerpt: item.properties.excerpt,

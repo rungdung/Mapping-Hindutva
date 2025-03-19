@@ -18,6 +18,7 @@
     lookingGlassBool,
     parentSearchSuggestions,
     searchQuery,
+    resourceBlob,
   } from "./stores";
   import { sampleSize, geocoderApi } from "$lib/utils.js";
   import { fly } from "svelte/transition";
@@ -68,8 +69,12 @@
         features;
       // query the layer for the existence of a keyword in teh title
       // get random points from nearby
+
+      let layersToQuery = $resourceBlob
+        .filter((layer) => layer.visibility === true)
+        .map((layer) => layer.layerId);
       let getNearbyFeatures = $map.queryRenderedFeatures({
-        layers: ["point"],
+        layers: layersToQuery,
       });
 
       // loop through the properties
@@ -88,12 +93,7 @@
         }
       });
 
-      $eventsInHighlight = {
-        features: toBehighlighted,
-        type: "FeatureCollection",
-      };
-      $eventsInHighlight = $eventsInHighlight;
-
+      $eventsInHighlight = toBehighlighted;
       // create a duplicate source for the highlight
       if ($map.getSource("hwdb-highlight")) {
         features = $map
@@ -145,14 +145,19 @@
   }
 </script>
 
-<div class="">
+<div
+  class=""
+  on:click={(e) => {
+    e.stopPropagation();
+  }}
+>
   <div class="bg-neutral-200">
     <div class="flex">
       <input
         type="text"
         id="search-input"
         bind:value={$searchQuery}
-        class="bg-neutral-400 flex-auto text-white py-2 px-1 bg-gray-300"
+        class="bg-neutral-400 flex-auto text-white py-2 px-1 bg-gray-300 z-30"
         placeholder="Search for an event or place"
         on:keydown={(e) => {
           if (e.key === "Enter") {
@@ -161,13 +166,13 @@
         }}
       />
       <Button
-        class="w-14 flex-none my-4"
+        class=" flex-none my-4"
         kind="secondary"
         on:click={() => searchLayer($searchQuery)}
         icon={Search}
       ></Button>
       <Button
-        class="w-14 flex-none my-4"
+        class="flex-none my-4"
         kind="secondary"
         on:click={() => ($searchQuery = "")}
         icon={CloseLarge}
@@ -177,7 +182,7 @@
       <div class="text-xs bold text-white">Search Suggestions:</div>
       {#each searchSuggestions as suggestion}
         <span
-          class="text-xs/5 bg-orange-200 px-1 rounded-sm hover:cursor-pointer"
+          class="text-xs/5 bg-orange-200 px-1 text-black rounded-sm hover:cursor-pointer"
           on:click={() => {
             $searchQuery = suggestion;
             searchLayer(suggestion);

@@ -7,18 +7,15 @@
    * The popup is a MarkerPopup component which is passed the feature's properties as props.
    */
   import { onMount } from "svelte";
-  import maplibre from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import MarkerPopup from "./MarkerPopup.svelte";
   import { resourceBlob, map, loadStatus, eventsInHighlight } from "./stores";
 
+  let altNewsBlob;
   /**
    * Fetches the resource data from the server and returns it as a promise
    */
-  async function getResource() {
-    return await fetch("/HWdb_23_09_2024_openai_geocoded_final.geojson").then(
-      (response) => response.json()
-    );
+  async function getResource(path) {
+    return await fetch(path).then((response) => response.json());
   }
 
   /**
@@ -28,24 +25,57 @@
    * It also adds a popup to the map which is displayed when the user clicks on a feature.
    */
   const addResourceLayer = async () => {
-    $resourceBlob = await getResource();
-
-    $map.addSource("hwdb", {
-      type: "geojson",
-      data: $resourceBlob,
-      attribution:
-        "News Articles belong to the News Agencies Cited. Aggregated by Hindutva Watch",
-    });
-
-    $map.addLayer({
-      id: "point",
-      type: "circle",
-      source: "hwdb",
-      paint: {
-        "circle-radius": 4,
-        "circle-color": "gray",
-        "circle-opacity": 0.5,
+    $resourceBlob = [
+      {
+        id: "hwdb",
+        layerId: "hwdb-point",
+        name: "Archive of Hindutva Watch aggregated News Articles",
+        attribution:
+          "News Articles belong to the News Agencies Cited. Aggregated by Hindutva Watch",
+        blob: await getResource(
+          "/HWdb_23_09_2024_openai_geocoded_final.geojson"
+        ),
+        type: "geojson",
+        layerType: "circle",
+        layerStyle: {
+          "circle-radius": 4,
+          "circle-color": "gray",
+          "circle-opacity": 0.5,
+        },
+        visibility: true,
       },
+      {
+        id: "altnews",
+        layerId: "altnews-point",
+        name: "Archive of Alt News Fact Checks",
+        attribution: "Fact Checks belong to AltNews",
+        blob: await getResource("/altnews_openai_13_03_2025_geocoded.geojson"),
+        visibility: true,
+        type: "geojson",
+        layerType: "circle",
+        layerStyle: {
+          "circle-radius": 4,
+          "circle-color": "green",
+          "circle-stroke-color": "brown",
+          "circle-stroke-width": 1,
+          "circle-opacity": 0.5,
+        },
+      },
+    ];
+
+    $resourceBlob.forEach((layer) => {
+      $map.addSource(layer.id, {
+        type: layer.type,
+        data: layer.blob,
+        attribution: layer.attribution,
+      });
+
+      $map.addLayer({
+        id: layer.layerId,
+        type: layer.layerType,
+        source: layer.id,
+        paint: layer.layerStyle,
+      });
     });
 
     $loadStatus.dataLoaded = true;
