@@ -1,0 +1,33 @@
+```{python}
+import requests
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import numpy as np
+
+url = "https://www.altnews.in/wp-json/wp/v2/posts?_embed&per_page=100&page="
+for i in range(10, 70):
+    try:
+        response = requests.get(url + str(i))
+        print(response)
+        data = response.json()
+        df = pd.DataFrame(data)
+        df.to_csv("/mnt/vault/Vault/Projects/Hindutva-Watch-Prototype/Scraper/data/altnews/raw" + str(i) + ".csv")
+    except Exception as e:
+        print(e)
+        continue
+```
+
+```{python}
+#combine all csvs
+import pandas as pd
+import os
+
+dfs = []
+for file in os.listdir("/mnt/vault/Vault/Projects/Hindutva-Watch-Prototype/Scraper/data/altnews/raw/"):
+    print("1",file)
+    dfs.append(pd.read_csv("/mnt/vault/Vault/Projects/Hindutva-Watch-Prototype/Scraper/data/altnews/raw/" + file))
+df = pd.concat(dfs)
+df.to_csv("/mnt/vault/Vault/Projects/Hindutva-Watch-Prototype/Scraper/data/altnews/altnews_13_03_2025.csv")
+
+```
