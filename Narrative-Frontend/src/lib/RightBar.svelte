@@ -4,6 +4,7 @@
     searchRange,
     map,
     searchQuery,
+    filteredEvents,
     singleEventInHighlight,
   } from "./stores.js";
 
@@ -12,8 +13,9 @@
   import Timeline from "./Timeline.svelte";
 
   import { getDomainFromUrl } from "$lib/utils.js";
+  import Filters from "./Filters.svelte";
 
-  let involvedGroups = $state([]);
+  let involvedGroups;
 
   // Handle click on top of map
   let handleClick = (event) => {
@@ -84,6 +86,8 @@
       });
     }
   };
+
+  $: $filteredEvents = $eventsInHighlight;
 </script>
 
 <div
@@ -99,56 +103,60 @@
     <br />
   {/snippet}
   <div class="row-span-7 overflow-y-scroll">
-    {#each $eventsInHighlight as row}
-      <div
-        class="card space-y-2 overflow-y-scroll hover:bg-orange-200 hover:text-black {$singleEventInHighlight
-          ?.properties?.title == row?.properties?.title
-          ? 'highlight'
-          : ''}"
-        onclick={() => handleClick(row)}
-        onmouseover={() => handleHover(row)}
-      >
-        <div>
-          {@html row?.properties?.title}
-          <br />
-          <div class="grid grid-cols-5 mt-2">
-            <div class="col-span-2">
-              <span class=" text-xs">
-                Category:
-                <span class="px-1 bg-orange-300 text-black"
-                  >{row?.properties?.category_slug
-                    ? row?.properties?.category_slug
-                    : "Uncategorised"}</span
-                ></span
-              ><br />
-              <span class="text-xs">
-                Source:
-                <a
-                  href={row?.properties?.link}
-                  target="
+    {#await $filteredEvents then}
+      {#if $filteredEvents?.length > 0}
+        <Filters></Filters>
+      {/if}
+      {#each $filteredEvents as row}
+        <div
+          class="card space-y-2 overflow-y-scroll hover:bg-orange-200 hover:text-black {$singleEventInHighlight
+            ?.properties?.title == row?.properties?.title
+            ? 'highlight'
+            : ''}"
+          onclick={() => handleClick(row)}
+          onmouseover={() => handleHover(row)}
+        >
+          <div>
+            {@html row?.properties?.title}
+            <br />
+            <div class="grid grid-cols-5 mt-2">
+              <div class="col-span-2">
+                <span class=" text-xs">
+                  Category:
+                  <span class="px-1 bg-orange-300 text-black"
+                    >{row?.properties?.category_slug
+                      ? row?.properties?.category_slug
+                      : "Uncategorised"}</span
+                  ></span
+                ><br />
+                <span class="text-xs">
+                  Source:
+                  <a
+                    href={row?.properties?.link}
+                    target="
               _blank"
-                >
-                  <span class="px-1 bg-red-300 text-black"
-                    >{getDomainFromUrl(row?.properties?.link)}
-                    <Link class="inline" size="10" /></span
                   >
-                </a>
-              </span>
+                    <span class="px-1 bg-red-300 text-black"
+                      >{getDomainFromUrl(row?.properties?.link)}
+                      <Link class="inline" size="10" /></span
+                    >
+                  </a>
+                </span>
 
-              <br />
-              <span class=" text-xs">
-                Location:
-                <span class="px-1 bg-orange-300 text-black"
-                  >{row?.properties?.natural_locations_openai}</span
-                ></span
-              ><br />
-              <span class=" text-xs">
-                Article Dated
-                <span class="px-1 bg-orange-300 text-black"
-                  >{row?.properties?.date.slice(0, 10)}</span
-                ></span
-              >
-              <!-- <div class="w-full">
+                <br />
+                <span class=" text-xs">
+                  Location:
+                  <span class="px-1 bg-orange-300 text-black"
+                    >{row?.properties?.natural_locations_openai}</span
+                  ></span
+                ><br />
+                <span class=" text-xs">
+                  Article Dated
+                  <span class="px-1 bg-orange-300 text-black"
+                    >{row?.properties?.date.slice(0, 10)}</span
+                  ></span
+                >
+                <!-- <div class="w-full">
             <Button
               iconDescription="Locate"
               icon={LocationFilled}
@@ -157,22 +165,23 @@
               size="small"
             ></Button>
           </div> -->
-            </div>
+              </div>
 
-            <div class="excerpt space-y-2 col-span-3">
-              {@html row?.properties?.excerpt?.replace("<p>", "")}
-              <div class="line-height-10">
-                {#each eval(row?.properties?.involved) as group}
-                  <span class="px-1 text-xs bg-orange-200 text-black"
-                    >{group}</span
-                  >,
-                {/each}
+              <div class="excerpt space-y-2 col-span-3">
+                {@html row?.properties?.excerpt?.replace("<p>", "")}
+                <div class="line-height-10">
+                  {#each eval(row?.properties?.involved) as group}
+                    <span class="px-1 text-xs bg-orange-200 text-black"
+                      >{group}</span
+                    >,
+                  {/each}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    {/each}
+      {/each}
+    {/await}
   </div>
 </div>
 

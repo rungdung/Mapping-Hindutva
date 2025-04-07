@@ -33,7 +33,7 @@
         attribution:
           "News Articles belong to the News Agencies Cited. Aggregated by Hindutva Watch",
         blob: await getResource(
-          "/HWdb_23_09_2024_openai_geocoded_final.geojson"
+          "/HWdb_23_09_2024_openai_geocoded_final.geojson",
         ),
         type: "geojson",
         layerType: "circle",
@@ -76,47 +76,41 @@
         source: layer.id,
         paint: layer.layerStyle,
       });
-    });
 
-    $loadStatus.dataLoaded = true;
-    $map.on("click", "point", (e) => {
-      let properties = e.features[0].properties;
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180)
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      $map.on("click", layer.layerId, (e) => {
+        let properties = e.features[0].properties;
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180)
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 
-      if ($eventsInHighlight.features.length > 0) {
-        $eventsInHighlight.features = [
-          e.features[0],
-          ...$eventsInHighlight.features,
-        ];
-      } else {
-        $eventsInHighlight = {
-          features: [e.features[0]],
-          type: "FeatureCollection",
-        };
-      }
+        if ($eventsInHighlight?.features?.length > 0) {
+          $eventsInHighlight = [e.features[0], ...$eventsInHighlight.features];
+        } else {
+          $eventsInHighlight = [e.features[0]];
+        }
 
-      // let popup = new maplibre.Popup()
-      //   .setLngLat(coordinates)
-      //   .setHTML("")
-      //   .addTo($map);
-      // let child = popup.getElement();
-      // new MarkerPopup({
-      //   target: child.children[1],
-      //   props: {
-      //     title: properties.title,
-      //     excerpt: properties.excerpt,
-      //     date: properties.date,
-      //     link: properties.link,
-      //     locations: properties.natural_locations_openai,
-      //     map: $map,
-      //     coordinates: coordinates,
-      //     point: e.point,
-      //   },
-      // });
+        $loadStatus.dataLoaded = true;
+
+        // let popup = new maplibre.Popup()
+        //   .setLngLat(coordinates)
+        //   .setHTML("")
+        //   .addTo($map);
+        // let child = popup.getElement();
+        // new MarkerPopup({
+        //   target: child.children[1],
+        //   props: {
+        //     title: properties.title,
+        //     excerpt: properties.excerpt,
+        //     date: properties.date,
+        //     link: properties.link,
+        //     locations: properties.natural_locations_openai,
+        //     map: $map,
+        //     coordinates: coordinates,
+        //     point: e.point,
+        //   },
+        // });
+      });
     });
   };
-
   onMount(() => addResourceLayer());
 </script>
