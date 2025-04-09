@@ -9,35 +9,29 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.0.3",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@vincjo/datatables": "^2.0.5",
     "autoprefixer": "^10.4.20",
     "mdsvex": "^0.12.3",
     "postcss": "^8.4.47",
-    "svelte": "^5.2.7",
     "tailwindcss": "^3.4.13"
   },
   "dependencies": {
-    "@deck.gl/core": "^8.9.34",
-    "@deck.gl/layers": "^8.9.34",
-    "@deck.gl/mapbox": "^8.9.34",
     "@maplibre/maplibre-gl-geocoder": "^1.7.0",
     "@sveltejs/adapter-auto": "^3.2.5",
     "@sveltejs/adapter-static": "^3.0.5",
-    "@sveltejs/kit": "^2.6.4",
+    "@sveltejs/kit": "^2.20.3",
     "@turf/collect": "^6.5.0",
     "@turf/turf": "^6.5.0",
-    "carbon-components-svelte": "^0.86.0",
+    "carbon-components-svelte": "^0.88.4",
     "carbon-icons-svelte": "^13.2.0",
     "d3": "^7.9.0",
-    "d3-cloud": "^1.2.7",
-    "d3-milestones": "^1.4.7",
-    "litegraph": "^0.0.0",
-    "litegraph.js": "^0.7.12",
+    "esbuild": "^0.25.2",
     "maplibre-gl": "^4.0.0",
+    "svelte": "^5.25.7",
     "svelte-collapsible": "^0.2.1",
     "vaul-svelte": "^0.3.2",
-    "vite": "^5.4.8"
+    "vite": "^6.2.5"
   },
-  "packageManager": "yarn@4.6.0+sha512.5383cc12567a95f1d668fbe762dfe0075c595b4bfff433be478dbbe24e05251a8e8c3eb992a986667c1d53b6c3a9c85b8398c35a960587fbd9fa3a0915406728"
+  "packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808"
 }
