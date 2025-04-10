@@ -118,10 +118,10 @@
   };
 
   // Use the debounced version of handleMouseMove
-  const debouncedMouseMove = debounce(handleMouseMove, 50);
+  const debouncedMouseMove = debounce(handleMouseMove, 5);
 
   // Reactive statement to set up mouse move listener
-  $: if ($loadStatus.dataLoaded && $map) {
+  $: if ($loadStatus.dataLoaded && $map ) {
     // Remove previous listener if exists
     if (mouseMoveUnsubscribe) {
       mouseMoveUnsubscribe();
