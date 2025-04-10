@@ -94,7 +94,7 @@
   id="meta-info"
   class="text-[#faf6eb] rounded-none grid grid-rows-10 gap-2 max-h-screen"
 >
-  <Timeline />
+  <!-- <Timeline /> -->
   {#snippet header()}
     <div>
       Events under the looking glass within a radius of {$searchRange}km
@@ -102,11 +102,14 @@
 
     <br />
   {/snippet}
-  <div class="row-span-7 overflow-y-scroll">
+
     {#await $filteredEvents then}
-      {#if $filteredEvents?.length > 0}
+      {#if $filteredEvents}
+      <div class="row-span-4">
         <Filters></Filters>
+      </div>
       {/if}
+      <div class="row-span-6 overflow-y-scroll">
       {#each $filteredEvents as row}
         <div
           class="card space-y-2 overflow-y-scroll hover:bg-orange-200 hover:text-black {$singleEventInHighlight
@@ -181,8 +184,9 @@
           </div>
         </div>
       {/each}
+    </div>
     {/await}
-  </div>
+
 </div>
 
 <style>
