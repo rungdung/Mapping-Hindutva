@@ -18,14 +18,15 @@
   }
 </script>
 
-<div class="mb-2 bg-neutral-600 text-white space-y-2 p-2">
+<div class="bg-neutral-800 text-white space-y-2 p-4 w-full">
   {#each $resourceBlob as layer}
-    <div class="mt-2 text-xs grid grid-cols-5 gap-2">
-      <span class="col-span-4">{layer.name}</span>
+    <div class="mt-2 text-xs gap-2 grid grid-cols-6 w-full">
       <Checkbox
-        class="text-xs col-span-1 align-middle my-auto"
+        class="text-xs col-span-4"
         bind:checked={layer.visibility}
-      ></Checkbox>
+        labelText={layer.name + ' with ' + layer.blob.features.length + ' events'}
+      ></Checkbox> <img class="col-span-2 align-middle" src="/{layer.sprite}.png"/>
     </div>
   {/each}
+   <p class="!text-xs"> ⓘ Each event may not be a unique report. If a report mentions multiple places, it is placed in multiple places and is thus duplicated. Go to <a href="/about#how-it-works">How it works</a> for more info</p>  
 </div>

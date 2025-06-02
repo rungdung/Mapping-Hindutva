@@ -24,13 +24,13 @@
   onMount(() => {
     $map = new maplibre.Map({
       container: mapContainer,
-      style: `https://api.maptiler.com/maps/5b0fdf12-ac62-4bd8-975b-50ac01e3abbd/style.json?key=${publicMaptilerKey}`,
+      style: `https://api.maptiler.com/maps/01968bd2-6fa9-7f27-b872-668712ea8381/style.json?key=${publicMaptilerKey}`,
       center: [77.695313, 23.160563],
       pitch: 0,
       bearing: 0,
-      zoom: 3,
-      maxZoom: 14,
-      minZoom: 3,
+      zoom: 5,
+      maxZoom: 11,
+      minZoom: 4,
       transformRequest: (url) => ({ url, cache: "force-cache" }),
     });
 
@@ -40,13 +40,21 @@
     $map.addControl(new maplibre.NavigationControl());
 
     // Handle map load event
-    $map.on("load", () => {
+    $map.on("load", async () => {
+      
+      const image = await $map.loadImage("rhombus.png")
+      await $map.addImage('rhombus', image.data);
+
+      const image2 = await $map.loadImage("star.png")
+      await $map.addImage('star', image2.data);
+
       // Load ResourceLayer
       mapLoaded = true;
-    });
+      $map.on("click", (event) => {
+        $lookingGlassBool = false;
+      });
 
-    $map.on("click", (event) => {
-      $lookingGlassBool = false;
+     
     });
   });
 

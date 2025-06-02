@@ -90,29 +90,17 @@
   $: $filteredEvents = $eventsInHighlight;
 </script>
 
-<div
-  id="meta-info"
-  class="text-[#faf6eb] rounded-none grid grid-rows-10 gap-2 max-h-screen"
->
-  <!-- <Timeline /> -->
-  {#snippet header()}
-    <div>
-      Events under the looking glass within a radius of {$searchRange}km
-    </div>
-
-    <br />
-  {/snippet}
-
-    {#await $filteredEvents then}
-      {#if $filteredEvents}
-      <div class="row-span-4">
+<div id="meta-info" class="text-[#faf6eb] grid grid-rows-10 h-screen p-4 max-h-screen">
+  {#await $filteredEvents then}
+    {#if $filteredEvents}
+      <div class="row-span-3">
         <Filters></Filters>
       </div>
-      {/if}
-      <div class="row-span-6 overflow-y-scroll">
+    {/if}
+    <div class="row-span-7 overflow-y-scroll space-y-2">
       {#each $filteredEvents as row}
-        <div
-          class="card space-y-2 overflow-y-scroll hover:bg-orange-200 hover:text-black {$singleEventInHighlight
+        <button
+          class="card space-y-2 bg-neutral-800 hover:bg-orange-200 hover:text-black !text-left {$singleEventInHighlight
             ?.properties?.title == row?.properties?.title
             ? 'highlight'
             : ''}"
@@ -120,58 +108,28 @@
           onmouseover={() => handleHover(row)}
         >
           <div>
-            {@html row?.properties?.title}
+            <h3>
+              {@html row?.properties?.title}, reported on <span
+                >{new Date(row?.properties?.date).toLocaleString(
+                  "en-GB",
+                {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                })}</span
+              >
+            </h3>
+            <div class="">
+              <span class="bg-orange-300 text-xs text-black"
+                >{row?.properties?.category_slug
+                  ? row?.properties?.category_slug
+                  : "Uncategorised"} from {row?.properties?.natural_locations_openai} </span
+              >
+            </div>
             <br />
-            <div class="grid grid-cols-5 mt-2">
-              <div class="col-span-2">
-                <span class=" text-xs">
-                  Category:
-                  <span class="px-1 bg-orange-300 text-black"
-                    >{row?.properties?.category_slug
-                      ? row?.properties?.category_slug
-                      : "Uncategorised"}</span
-                  ></span
-                ><br />
-                <span class="text-xs">
-                  Source:
-                  <a
-                    href={row?.properties?.link}
-                    target="
-              _blank"
-                  >
-                    <span class="px-1 bg-red-300 text-black"
-                      >{getDomainFromUrl(row?.properties?.link)}
-                      <Link class="inline" size="10" /></span
-                    >
-                  </a>
-                </span>
-
-                <br />
-                <span class=" text-xs">
-                  Location:
-                  <span class="px-1 bg-orange-300 text-black"
-                    >{row?.properties?.natural_locations_openai}</span
-                  ></span
-                ><br />
-                <span class=" text-xs">
-                  Article Dated
-                  <span class="px-1 bg-orange-300 text-black"
-                    >{row?.properties?.date.slice(0, 10)}</span
-                  ></span
-                >
-                <!-- <div class="w-full">
-            <Button
-              iconDescription="Locate"
-              icon={LocationFilled}
-              onclick={() => handleClick(row)}
-              kind="tertiary"
-              size="small"
-            ></Button>
-          </div> -->
-              </div>
-
-              <div class="excerpt space-y-2 col-span-3">
-                {@html row?.properties?.excerpt?.replace("<p>", "")}
+            <div class="mt-2 ">
+              <div class="excerpt space-y-2">
+                <p>{@html row?.properties?.excerpt?.replace("<p>", "")}</p>
                 <div class="line-height-10">
                   {#each eval(row?.properties?.involved) as group}
                     <span class="px-1 text-xs bg-orange-200 text-black"
@@ -182,11 +140,22 @@
               </div>
             </div>
           </div>
-        </div>
+          <Button
+          size="sm"
+          class="hover:cursor-default"
+          kind="tertiary"
+          href={row?.properties?.link}
+          target="blank"
+        >
+          <span class="px-1 text-xs"
+            > Read more from {getDomainFromUrl(row?.properties?.link)}
+            <Link class="inline" size="10" /></span
+          >
+        </Button>
+        </button>
       {/each}
     </div>
-    {/await}
-
+  {/await}
 </div>
 
 <style>
@@ -213,5 +182,15 @@
 
   .card {
     @apply w-full p-2 px-4;
+  }
+
+  .card h3 {
+    font-family: Junicode;
+    font-variation-settings:
+      "wght" 400,
+      "wdth" 0;
+    line-height: 1.5rem;
+    font-size: 1.4rem;
+    word-break: normal;
   }
 </style>

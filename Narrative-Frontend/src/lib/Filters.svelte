@@ -332,12 +332,10 @@
   }
 </script>
 
-<div class="filters-container p-2 bg-gray-800 rounded m-2 text-xs">
-  <h3 class="text-sm font-bold mb-1 text-orange-300">Filters</h3>
+<div class="filters-container p-2 bg-gray-800 rounded text-xs">
 
   <!-- Custom Date Range Slider -->
   <div class="mb-2">
-    <h4 class="text-xs font-semibold mb-1 text-orange-200">Date Range</h4>
     <div class="date-display">
       <span>{startDate ? formatDate(startDate) : "N/A"}</span>
       <span>to</span>
@@ -357,14 +355,14 @@
       <div
         class="handle handle-left"
         bind:this={leftHandle}
-        on:mousedown={(e) => handleMouseDown(e, "left")}
+        on:drag={(e) => handleMouseDown(e, "left")}
       >
         <div class="handle-grip"></div>
       </div>
       <div
         class="handle handle-right"
         bind:this={rightHandle}
-        on:mousedown={(e) => handleMouseDown(e, "right")}
+        on:drag={(e) => handleMouseDown(e, "right")}
       >
         <div class="handle-grip"></div>
       </div>
@@ -445,7 +443,7 @@
 
   <!-- Filter Actions -->
   <div class="flex justify-between mt-2">
-    <Button kind="danger" size="sm" on:click={resetFilters}>Reset</Button>
+    <Button kind="danger-tertiary" size="sm" on:click={resetFilters}>Reset</Button>
 
     <div class="text-xs text-orange-200">
       {$filteredEvents?.length}/{$eventsInHighlight?.length} events

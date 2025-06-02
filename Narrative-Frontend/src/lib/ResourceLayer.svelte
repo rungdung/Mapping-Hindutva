@@ -14,9 +14,9 @@
     loadStatus,
     eventsInHighlight,
     lookingGlassBool,
+    singleEventInHighlight,
   } from "./stores";
 
-  let altNewsBlob;
   /**
    * Fetches the resource data from the server and returns it as a promise
    */
@@ -35,7 +35,7 @@
       {
         id: "hwdb",
         layerId: "hwdb-point",
-        name: "Archive of Hindutva Watch aggregated News Articles",
+        name: "Hindutva Watch aggregated News Articles",
         attribution:
           "News Articles belong to the News Agencies Cited. Aggregated by Hindutva Watch",
         sourceLink: "hindutvawatch.org",
@@ -43,7 +43,7 @@
           "/HWdb_23_09_2024_openai_geocoded_final.geojson",
         ),
         type: "geojson",
-        layerType: "circle",
+        layerType: "symbol",
         layerStyle: {
           "circle-radius": 4,
           "circle-color": "gray",
@@ -51,18 +51,19 @@
         },
         filterVisibility: true,
         visibility: true,
+        sprite: "star"
       },
       {
         id: "altnews",
         layerId: "altnews-point",
-        name: "Archive of Alt News Fact Checks",
+        name: "Alt News Fact Checks",
         attribution: "Fact Checks belong to AltNews",
         sourceLink: "altnews.in",
         blob: await getResource("/altnews_openai_13_03_2025_geocoded.geojson"),
         filterVisibility: true,
         visibility: true,
         type: "geojson",
-        layerType: "circle",
+        layerType: "symbol",
         layerStyle: {
           "circle-radius": 4,
           "circle-color": "green",
@@ -70,10 +71,13 @@
           "circle-stroke-width": 1,
           "circle-opacity": 0.5,
         },
+        sprite: "rhombus"
       },
     ];
 
     $resourceBlob.forEach((layer) => {
+      const images = $map.style.imageManager.images;
+      console.log('Available images:', Object.keys(images));
       $map.addSource(layer.id, {
         type: layer.type,
         data: layer.blob,
@@ -84,7 +88,11 @@
         id: layer.layerId,
         type: layer.layerType,
         source: layer.id,
-        paint: layer.layerStyle,
+        layout: {
+          'icon-image': layer.sprite,
+          'icon-size': 0.5,
+          'icon-allow-overlap': true,
+        }
       });
 
       $map.on("dblclick", layer.layerId, (e) => {
@@ -94,14 +102,16 @@
           while (Math.abs(e.lngLat.lng - coordinates[0]) > 180)
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 
-          if ($eventsInHighlight?.features?.length > 0) {
+          if ($eventsInHighlight?.length > 0) {
             $eventsInHighlight = [
               e.features[0],
-              ...$eventsInHighlight.features,
+              ...$eventsInHighlight,
             ];
           } else {
             $eventsInHighlight = [e.features[0]];
           }
+
+          $singleEventInHighlight = e.features[0]
         }
       });
     });

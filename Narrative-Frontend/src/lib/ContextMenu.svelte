@@ -63,7 +63,7 @@
       type="range"
       id="search-range"
       min="1"
-      max="300"
+      max="80"
       step="1"
       class="w-full px-auto"
       bind:value={$searchRange}
